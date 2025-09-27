@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Meat?Lovers Pizza Ð Ratios (Interactive Sliders + Worksheet)</title>
+<style>
+  :root{--s:#8b5e3c;--p:#e11d48;--b:#f59e0b;--h:#fb7185;--bf:#10b981;--grid:#e5e7eb;--ink:#0f172a;--ok:#16a34a;--no:#dc2626}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#fafafa;color:var(--ink)}
+  .wrap{max-width:980px;margin:24px auto;padding:0 16px}
+  h1{font-size:clamp(22px,3vw,30px);margin:.2rem 0 1rem}
+  .card{background:#fff;border:1px solid var(--grid);border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.05);padding:16px;margin-bottom:16px}
+  .row{display:grid;grid-template-columns:160px 1fr 140px;gap:10px;align-items:center;margin:10px 0}
+  input[type=range]{width:100%}
+  .num{font-weight:700}
+  .stack{display:flex;height:30px;border:1px solid #cbd5e1;border-radius:10px;overflow:hidden}
+  .seg{height:100%}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:14px}
+  .tag{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border:1px solid var(--grid);border-radius:999px}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  th,td{border:1px solid var(--grid);padding:8px;text-align:center}
+  th{background:#f1f5f9}
+  .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  button{border:1px solid #cbd5e1;background:#fff;border-radius:10px;padding:8px 10px;cursor:pointer}
+  button:hover{background:#f8fafc}
+  .small{font-size:13px;color:#475569}
+  input[type=text]{width:100px;padding:6px;border:1px solid #cbd5e1;border-radius:8px;text-align:center}
+  .ok{outline:2px solid var(--ok)}
+  .no{outline:2px solid var(--no)}
+  .msg{font-weight:700}
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Meat Lovers Pizza  Keep the Recipe Ratio</h1>
+    <p class="small">Per pizza, the recipe uses <b>1/4</b> cup sausage, <b>1/3</b> cup pepperoni, <b>1/6</b> cup bacon, <b>1/8</b> cup ham, and <b>1/8</b> cup beef. That totals <b>1 cup</b> of meat toppings per pizza. Move any slider below; the others update to keep the same ratio. Fractions display in simplified form (rounded to 1/24 cup).</p>
+
+    <section class="card">
+      <h3 style="margin-top:0">Controls (choose any one to drive)</h3>
+      <div class="row"><label>Number of pizzas</label><input id="sK" type="range" min="0" max="12" step="0.125" value="4"><div class="num" id="nK">4</div></div>
+      <div class="row"><label>Sausage (cups)</label><input id="sS" type="range" min="0" max="6" step="0.0416667" value="1"><div class="num" id="nS">1</div></div>
+      <div class="row"><label>Pepperoni (cups)</label><input id="sP" type="range" min="0" max="6" step="0.0416667" value="1.3333"><div class="num" id="nP">1 1/3</div></div>
+      <div class="row"><label>Bacon (cups)</label><input id="sB" type="range" min="0" max="6" step="0.0416667" value="0.6667"><div class="num" id="nB">2/3</div></div>
+      <div class="row"><label>Ham (cups)</label><input id="sH" type="range" min="0" max="6" step="0.0416667" value="0.5"><div class="num" id="nH">1/2</div></div>
+      <div class="row"><label>Beef (cups)</label><input id="sBe" type="range" min="0" max="6" step="0.0416667" value="0.5"><div class="num" id="nBe">1/2</div></div>
+      <div class="btns small">
+        <span>Presets (match worksheet rows):</span>
+        <button data-preset="k:4">Order 1: S=1 cup</button>
+        <button data-preset="k:6">Order 2: B=1 cup</button>
+        <button data-preset="k:9">Order 3: P=3 cups</button>
+        <button id="reset">Reset to 1 pizza</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3 style="margin-top:0">See the Mix</h3>
+      <div class="stack" aria-label="stacked bar">
+        <div id="segS" class="seg" style="background:var(--s)"></div>
+        <div id="segP" class="seg" style="background:var(--p)"></div>
+        <div id="segB" class="seg" style="background:var(--b)"></div>
+        <div id="segH" class="seg" style="background:var(--h)"></div>
+        <div id="segBe" class="seg" style="background:var(--bf)"></div>
+      </div>
+      <div class="legend">
+        <span class="tag"><span class="dot" style="background:var(--s)"></span>Sausage: <span id="lblS">1</span></span>
+        <span class="tag"><span class="dot" style="background:var(--p)"></span>Pepperoni: <span id="lblP">1 1/3</span></span>
+        <span class="tag"><span class="dot" style="background:var(--b)"></span>Bacon: <span id="lblB">2/3</span></span>
+        <span class="tag"><span class="dot" style="background:var(--h)"></span>Ham: <span id="lblH">1/2</span></span>
+        <span class="tag"><span class="dot" style="background:var(--bf)"></span>Beef: <span id="lblBe">1/2</span></span>
+        <span class="tag">Total cups this order: <b><span id="lblTotal">4</span></b></span>
+      </div>
+     <p class="small">
+  Per-pizza fractions (do not change): 
+  S = <sup>1</sup>/<sub>4</sub>, 
+  P = <sup>1</sup>/<sub>3</sub>, 
+  B = <sup>1</sup>/<sub>6</sub>, 
+  H = <sup>1</sup>/<sub>8</sub>, 
+  Beef = <sup>1</sup>/<sub>8</sub>. 
+  Number of pizzas = any topping &divide; its per-pizza fraction. 
+  Total cups in an order = number of pizzas.
+</p>    </section>
+
+    <section class="card">
+      <h3 style="margin-top:0">Worksheet (type answers as fractions)</h3>
+      <table>
+        <thead><tr><th></th><th>Order 1</th><th>Order 2</th><th>Order 3</th></tr></thead>
+        <tbody>
+          <tr><th>Sausage (cups)</th><td>1</td><td><input id="wS2" /></td><td><input id="wS3" /></td></tr>
+          <tr><th>Pepperoni (cups)</th><td><input id="wP1" /></td><td><input id="wP2" /></td><td>3</td></tr>
+          <tr><th>Bacon (cups)</th><td><input id="wB1" /></td><td>1</td><td><input id="wB3" /></td></tr>
+          <tr><th>Ham (cups)</th><td>1/2</td><td><input id="wH2" /></td><td><input id="wH3" /></td></tr>
+          <tr><th>Beef (cups)</th><td><input id="wBe1" /></td><td><input id="wBe2" /></td><td>1 1/8</td></tr>
+          <tr><th>TOTAL (cups)</th><td><input id="wT1" /></td><td><input id="wT2" /></td><td><input id="wT3" /></td></tr>
+        </tbody>
+      </table>
+      <div class="btns" style="margin-top:8px">
+        <button id="pasteO1">Fill Order 1 from sliders</button>
+        <button id="pasteO2">Fill Order 2 from sliders</button>
+        <button id="pasteO3">Fill Order 3 from sliders</button>
+        <button id="check">Check Answers</button>
+        <button id="clear">Clear Inputs</button>
+        <span id="feedback" class="msg"></span>
+      </div>
+      <p class="small">Tip: Click a preset to match an order, then paste values into that column. The checker accepts equivalent fractions and mixed numbers.</p>
+    </section>
+  </main>
+
+<script>
+  // Base per-pizza fractions
+  const base = {S:1/4, P:1/3, B:1/6, H:1/8, Be:1/8};
+  // DOM
+  const sK=document.getElementById('sK');
+  const sS=document.getElementById('sS');
+  const sP=document.getElementById('sP');
+  const sB=document.getElementById('sB');
+  const sH=document.getElementById('sH');
+  const sBe=document.getElementById('sBe');
+  const nK=document.getElementById('nK');
+  const nS=document.getElementById('nS');
+  const nP=document.getElementById('nP');
+  const nB=document.getElementById('nB');
+  const nH=document.getElementById('nH');
+  const nBe=document.getElementById('nBe');
+  const segS=document.getElementById('segS');
+  const segP=document.getElementById('segP');
+  const segB=document.getElementById('segB');
+  const segH=document.getElementById('segH');
+  const segBe=document.getElementById('segBe');
+  const lblS=document.getElementById('lblS');
+  const lblP=document.getElementById('lblP');
+  const lblB=document.getElementById('lblB');
+  const lblH=document.getElementById('lblH');
+  const lblBe=document.getElementById('lblBe');
+  const lblTotal=document.getElementById('lblTotal');
+
+  // fraction helpers (to 1/24 and simplified)
+  function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){const t=b;b=a%b;a=t;}return a||1}
+  function toFrac24(x){
+    const sign = x<0? '-' : '';
+    x=Math.abs(x);
+    let N=Math.round(x*24); // twenty-fourths
+    let W=Math.trunc(N/24); let R=N%24;
+    if(R===0) return sign + (W? ''+W:'0');
+    const g=gcd(R,24); const n=R/g, d=24/g;
+    return sign + (W? `${W} ${n}/${d}` : `${n}/${d}`);
+  }
+  function parseFrac(s){
+    if(!s) return NaN; s=s.trim().replace(/\s+/g,' ');
+    let m=s.match(/^(\d+)\s+(\d+)\/(\d+)$/); if(m){return +m[1]+(+m[2]/+m[3]);}
+    m=s.match(/^(\d+)\/(\d+)$/); if(m){return +m[1]/+m[2];}
+    m=s.match(/^\d+$/); if(m){return +s;} return NaN;
+  }
+
+  function show(k){
+    // compute amounts
+    const S=k*base.S, P=k*base.P, B=k*base.B, H=k*base.H, Be=k*base.Be; const T=k; // total cups
+    // sync slider numeric values
+    sK.value=k; sS.value=S; sP.value=P; sB.value=B; sH.value=H; sBe.value=Be;
+    // update numeric labels
+    nK.textContent = toFrac24(k);
+    nS.textContent = toFrac24(S); nP.textContent = toFrac24(P); nB.textContent = toFrac24(B); nH.textContent = toFrac24(H); nBe.textContent = toFrac24(Be);
+    lblS.textContent = toFrac24(S); lblP.textContent = toFrac24(P); lblB.textContent = toFrac24(B); lblH.textContent = toFrac24(H); lblBe.textContent = toFrac24(Be);
+    lblTotal.textContent = toFrac24(T);
+    // update stacked bar widths by proportion of total cups T
+    const w = x => T>0? (x/T*100) : 0;
+    segS.style.width = w(S)+'%';
+    segP.style.width = w(P)+'%';
+    segB.style.width = w(B)+'%';
+    segH.style.width = w(H)+'%';
+    segBe.style.width = w(Be)+'%';
+  }
+
+  // Wire sliders: if a topping moves, infer k from that topping/base
+  sK.addEventListener('input', e=> show(parseFloat(e.target.value)));
+  sS.addEventListener('input', e=> show(parseFloat(e.target.value)/(base.S)));
+  sP.addEventListener('input', e=> show(parseFloat(e.target.value)/(base.P)));
+  sB.addEventListener('input', e=> show(parseFloat(e.target.value)/(base.B)));
+  sH.addEventListener('input', e=> show(parseFloat(e.target.value)/(base.H)));
+  sBe.addEventListener('input', e=> show(parseFloat(e.target.value)/(base.Be)));
+
+  // Presets
+  document.querySelectorAll('button[data-preset]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const k=parseFloat(btn.dataset.preset.split(':')[1]);
+      show(k);
+    });
+  });
+  document.getElementById('reset').addEventListener('click',()=> show(1));
+
+  // Worksheet helpers: paste from sliders
+  function pasteOrder(col){
+    const k=parseFloat(sK.value);
+    const S=k*base.S, P=k*base.P, B=k*base.B, H=k*base.H, Be=k*base.Be;
+    if(col===1){
+      document.getElementById('wP1').value=toFrac24(P);
+      document.getElementById('wB1').value=toFrac24(B);
+      document.getElementById('wBe1').value=toFrac24(Be);
+      document.getElementById('wT1').value=toFrac24(k);
+    }
+    if(col===2){
+      document.getElementById('wS2').value=toFrac24(S);
+      document.getElementById('wP2').value=toFrac24(P);
+      document.getElementById('wH2').value=toFrac24(H);
+      document.getElementById('wBe2').value=toFrac24(Be);
+      document.getElementById('wT2').value=toFrac24(k);
+    }
+    if(col===3){
+      document.getElementById('wS3').value=toFrac24(S);
+      document.getElementById('wB3').value=toFrac24(B);
+      document.getElementById('wH3').value=toFrac24(H);
+      document.getElementById('wT3').value=toFrac24(k);
+    }
+  }
+  document.getElementById('pasteO1').addEventListener('click',()=>pasteOrder(1));
+  document.getElementById('pasteO2').addEventListener('click',()=>pasteOrder(2));
+  document.getElementById('pasteO3').addEventListener('click',()=>pasteOrder(3));
+
+  // Check answers
+  const ans = {
+    // Order 1 (k=4)
+    wP1: 4*(1/3), wB1: 4*(1/6), wBe1: 4*(1/8), wT1: 4,
+    // Order 2 (k=6)
+    wS2: 6*(1/4), wP2: 6*(1/3), wH2: 6*(1/8), wBe2: 6*(1/8), wT2: 6,
+    // Order 3 (k=9)
+    wS3: 9*(1/4), wB3: 9*(1/6), wH3: 9*(1/8), wT3: 9
+  };
+  function nearly(a,b){return Math.abs(a-b) < 1/384} // tighter than 1/24
+  document.getElementById('check').addEventListener('click',()=>{
+    let score=0, total=Object.keys(ans).length;
+    Object.entries(ans).forEach(([id,val])=>{
+      const el=document.getElementById(id); if(!el) return;
+      const v=parseFrac(el.value); el.classList.remove('ok','no');
+      if(!isNaN(v) && nearly(v,val)){ el.classList.add('ok'); score++; } else { el.classList.add('no'); }
+    });
+    const fb=document.getElementById('feedback');
+    fb.textContent=`${score}/${total} correct`; fb.style.color=(score===total)?'var(--ok)':'var(--no)';
+  });
+  document.getElementById('clear').addEventListener('click',()=>{
+    Object.keys(ans).forEach(id=>{const el=document.getElementById(id); if(el){el.value=''; el.classList.remove('ok','no');}});
+    document.getElementById('feedback').textContent='';
+  });
+
+  // init at Order 1 (k=4)
+  show(4);
+</script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mac & Cheese Ratios Simple,Reliable Sliders</title>
+<style>
+  :root{--blue:#3b82f6;--yellow:#f59e0b;--grid:#e5e7eb;--ink:#0f172a;--ok:#16a34a;--no:#dc2626}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#fafafa;color:var(--ink)}
+  .wrap{max-width:860px;margin:24px auto;padding:0 16px}
+  h1{font-size:clamp(22px,3vw,30px);margin:.2rem 0 1rem}
+  .card{background:#fff;border:1px solid var(--grid);border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.05);padding:16px;margin-bottom:16px}
+  .row{display:grid;grid-template-columns:150px 1fr 120px;gap:10px;align-items:center;margin:10px 0}
+  input[type=range]{width:100%}
+  .num{font-weight:700}
+  .barbox{border:1px dashed #cbd5e1;border-radius:12px;padding:14px}
+  .bar{display:flex;height:36px;border-radius:10px;overflow:hidden;border:1px solid #cbd5e1}
+  .nood{background:var(--blue)}
+  .che{background:var(--yellow)}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:14px}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block;vertical-align:middle;margin-right:6px}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  th,td{border:1px solid var(--grid);padding:8px;text-align:center}
+  th{background:#f1f5f9}
+  .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  button{border:1px solid #cbd5e1;background:#fff;border-radius:10px;padding:8px 10px;cursor:pointer}
+  button:hover{background:#f8fafc}
+  .small{font-size:13px;color:#475569}
+  input[type=text]{width:90px;padding:6px;border:1px solid #cbd5e1;border-radius:8px;text-align:center}
+  .ok{outline:2px solid var(--ok)}
+  .no{outline:2px solid var(--no)}
+  .msg{font-weight:700}
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Mac & Cheese Ratios (4 : 1 : 5)  Simple Interactive</h1>
+    <p class="small">Rule: 4 cups noodles + 1 cup cheese = 5 cups pan. Move <b>any</b> slider; the others follow the ratio. Fractions are shown in <b>simplified</b> form (rounded to eighths).</p>
+
+    <section class="card">
+      <div class="row">
+        <label for="sPan">Pan size</label>
+        <input id="sPan" type="range" min="0" max="10" step="0.125" value="5">
+        <div class="num" id="nPan">5</div>
+      </div>
+      <div class="row">
+        <label for="sNoodles">Noodles</label>
+        <input id="sNoodles" type="range" min="0" max="10" step="0.125" value="4">
+        <div class="num" id="nNoodles">4</div>
+      </div>
+      <div class="row">
+        <label for="sCheese">Cheese</label>
+        <input id="sCheese" type="range" min="0" max="5" step="0.125" value="1">
+        <div class="num" id="nCheese">1</div>
+      </div>
+      <div class="btns small">
+        <span>Presets:</span>
+        <button data-preset="pan:5">Pan 5</button>
+        <button data-preset="noodles:3">Noodles 3</button>
+        <button data-preset="cheese:0.25">Cheese 1/4</button>
+        <button data-preset="noodles:0.6667">Noodles 2/3</button>
+        <button data-preset="noodles:5.3333">Noodles 5 1/3</button>
+        <button data-preset="pan:5.625">Pan 5 5/8</button>
+        <button id="resetAll"><b>Reset 4 : 1 : 5</b></button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3 style="margin-top:0">See it!</h3>
+      <div class="barbox">
+        <div class="bar" aria-label="bar model">
+          <div class="nood" id="barN"></div>
+          <div class="che" id="barC"></div>
+        </div>
+        <div class="legend">
+          <span><span class="dot" style="background:var(--blue)"></span>Noodles: <span id="lblN">4 0/8</span></span>
+          <span><span class="dot" style="background:var(--yellow)"></span>Cheese: <span id="lblC">1 0/8</span></span>
+          <span><span class="small">Pan total: <b><span id="lblP">5 0/8</span></b></span></span>
+        </div>
+      </div>
+      <p class="small" style="margin-top:10px">
+  Always true: Cheese = <sup>1</sup>/<sub>4</sub> &times; Noodles; 
+  Pan = Noodles + Cheese; 
+  also Noodles = <sup>4</sup>/<sub>5</sub> &times; Pan, 
+  Cheese = <sup>1</sup>/<sub>5</sub> &times; Pan.
+</p>
+    </section>
+
+    <section class="card">
+      <h3 style="margin-top:0">Worksheet (type answers as fractions)</h3>
+      <table>
+        <thead>
+          <tr><th>Noodles (cups)</th><th>Cheese (cups)</th><th>Pan Size (cups)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><input id="i1n" /></td><td><input id="i1c" /></td><td>5</td></tr>
+          <tr><td>3</td><td>3/4</td><td><input id="i2p" /></td></tr>
+          <tr><td><input id="i3n" /></td><td>1/4</td><td><input id="i3p" /></td></tr>
+          <tr><td>2/3</td><td><input id="i4c" /></td><td><input id="i4p" /></td></tr>
+          <tr><td>5 1/3</td><td><input id="i5c" /></td><td><input id="i5p" /></td></tr>
+          <tr><td><input id="i6n" /></td><td><input id="i6c" /></td><td>5 5/8</td></tr>
+        </tbody>
+      </table>
+      <div class="btns" style="margin-top:8px">
+        <label class="small">Fill selected row from sliders:</label>
+        <select id="rowSel">
+          <option value="1">Row 1</option>
+          <option value="2">Row 2</option>
+          <option value="3">Row 3</option>
+          <option value="4">Row 4</option>
+          <option value="5">Row 5</option>
+          <option value="6">Row 6</option>
+        </select>
+        <button id="fillSelected">Fill Selected Row</button>
+        <button id="check">Check Answers</button>
+        <button id="clear">Clear Inputs</button>
+        <span id="feedback" class="msg"></span>
+      </div>
+    </section>
+  </main>
+
+<script>
+  // ---------- helpers ----------
+  const rN=4/5, rC=1/5; // fixed ratio parts
+  const sPan=document.getElementById('sPan');
+  const sN=document.getElementById('sNoodles');
+  const sC=document.getElementById('sCheese');
+  const nPan=document.getElementById('nPan');
+  const nN=document.getElementById('nNoodles');
+  const nC=document.getElementById('nCheese');
+  const barN=document.getElementById('barN');
+  const barC=document.getElementById('barC');
+  const lblN=document.getElementById('lblN');
+  const lblC=document.getElementById('lblC');
+  const lblP=document.getElementById('lblP');
+
+  function gcd(a,b){ a=Math.abs(a); b=Math.abs(b); while(b){ const t=b; b=a%b; a=t;} return a||1; }
+
+  function toFrac8Simplified(x){
+    // Represent x rounded to nearest 1/8 as a simplified mixed number (e.g., 4 1/2, not 4 4/8)
+    const sign = x<0? '-' : '';
+    x=Math.abs(x);
+    let e=Math.round(x*8); // eighths
+    let W=Math.trunc(e/8); let R=e%8; // whole and remainder eighths
+    if(R===0) return sign + (W? String(W) : '0');
+    const g=gcd(R,8); const n=R/g, d=8/g; // reduced remainder
+    return sign + (W? `${W} ${n}/${d}` : `${n}/${d}`);
+  }
+
+  function parseFraction(str){
+    // Accept a, a/b, a b/c
+    if(!str) return NaN; str=str.trim().replace(/\s+/g,' ');
+    let m=str.match(/^(\d+)\s+(\d+)\/(\d+)$/); if(m){return +m[1]+(+m[2]/+m[3]);}
+    m=str.match(/^(\d+)\/(\d+)$/); if(m){return +m[1]/+m[2];}
+    m=str.match(/^\d+$/); if(m){return +str;} return NaN;
+  }
+
+  function setFromPan(p){
+    const n=p*rN, c=p*rC;
+    // sync slider raw values (numbers)
+    sPan.value=p; sN.value=n; sC.value=c;
+    // labels (simplified fractions)
+    nPan.textContent=toFrac8Simplified(p);
+    nN.textContent=toFrac8Simplified(n);
+    nC.textContent=toFrac8Simplified(c);
+    lblP.textContent=toFrac8Simplified(p);
+    lblN.textContent=toFrac8Simplified(n);
+    lblC.textContent=toFrac8Simplified(c);
+    // bar widths (percent of pan)
+    const pctN=(p>0? n/p:0)*100, pctC=(p>0? c/p:0)*100;
+    barN.style.width=pctN+'%';
+    barC.style.width=pctC+'%';
+  }
+  function setFromNoodles(n){ setFromPan(n/rN); }
+  function setFromCheese(c){ setFromPan(c/rC); }
+
+  // wire sliders
+  sPan.addEventListener('input', e=> setFromPan(parseFloat(e.target.value)));
+  sN.addEventListener('input', e=> setFromNoodles(parseFloat(e.target.value)));
+  sC.addEventListener('input', e=> setFromCheese(parseFloat(e.target.value)));
+
+  // presets
+  document.querySelectorAll('button[data-preset]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const parts=b.dataset.preset.split(',');
+      let p=null,n=null,c=null;
+      parts.forEach(s=>{const [k,v]=s.split(':'); const x=parseFloat(v); if(k==='pan') p=x; if(k==='noodles') n=x; if(k==='cheese') c=x;});
+      if(p==null && n!=null) p=n/rN; if(p==null && c!=null) p=c/rC; if(p==null) p=5;
+      setFromPan(p);
+    });
+  });
+
+  // reset to 4:1:5 and clear table highlights
+  document.getElementById('resetAll').addEventListener('click',()=>{
+    setFromPan(5);
+    ['i1n','i1c','i2p','i3n','i3p','i4c','i4p','i5c','i5p','i6n','i6c'].forEach(id=>{
+      const el=document.getElementById(id); if(el){ el.classList.remove('ok','no'); }
+    });
+    document.getElementById('feedback').textContent='';
+  });
+
+  // fill selected row
+  document.getElementById('fillSelected').addEventListener('click',()=>{
+    const row=parseInt(document.getElementById('rowSel').value,10);
+    const p=parseFloat(sPan.value), n=parseFloat(sN.value), c=parseFloat(sC.value);
+    const put=(id,val)=>{ const el=document.getElementById(id); if(el) el.value=val; };
+    if(row===1){ put('i1n',toFrac8Simplified(n)); put('i1c',toFrac8Simplified(c)); }
+    if(row===2){ put('i2p',toFrac8Simplified(p)); }
+    if(row===3){ put('i3n',toFrac8Simplified(n)); put('i3p',toFrac8Simplified(p)); }
+    if(row===4){ put('i4c',toFrac8Simplified(c)); put('i4p',toFrac8Simplified(p)); }
+    if(row===5){ put('i5c',toFrac8Simplified(c)); put('i5p',toFrac8Simplified(p)); }
+    if(row===6){ put('i6n',toFrac8Simplified(n)); put('i6c',toFrac8Simplified(c)); }
+  });
+
+  // answer key (exact values)
+  const ans={
+    i1n:4, i1c:1,
+    i2p:3+3/4,
+    i3n:1, i3p:1+1/4,
+    i4c:(2/3)/4, i4p:(2/3)+(2/3)/4,
+    i5c:(16/3)/4, i5p:(16/3)+(16/3)/4,
+    i6n:(45/8)*4/5, i6c:(45/8)*1/5
+  };
+  const nearly=(a,b)=>Math.abs(a-b)<1/128;
+
+  // check answers
+  document.getElementById('check').addEventListener('click',()=>{
+    let score=0, total=Object.keys(ans).length;
+    Object.entries(ans).forEach(([id,val])=>{
+      const el=document.getElementById(id); if(!el) return;
+      const v=parseFraction(el.value);
+      el.classList.remove('ok','no');
+      if(!isNaN(v) && nearly(v,val)){ el.classList.add('ok'); score++; } else { el.classList.add('no'); }
+    });
+    const fb=document.getElementById('feedback');
+    fb.textContent=`${score}/${total} correct`;
+    fb.style.color=(score===total)?'var(--ok)':'var(--no)';
+  });
+
+  // clear inputs
+  document.getElementById('clear').addEventListener('click',()=>{
+    ['i1n','i1c','i2p','i3n','i3p','i4c','i4p','i5c','i5p','i6n','i6c'].forEach(id=>{
+      const el=document.getElementById(id); if(el){ el.value=''; el.classList.remove('ok','no'); }
+    });
+    document.getElementById('feedback').textContent='';
+  });
+
+  // init
+  setFromPan(5);
+</script>
+</body>
+</html>

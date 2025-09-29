@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Percent Explorer Ð Double Number Lines, Tape Diagrams & Quiz</title>
+<style>
+  :root{ --bg:#0b1020; --panel:#141a33; --ink:#eef3ff; --muted:#aab4d6; --accent:#6ea8fe; --ok:#2bd3a3; --warn:#ffd166; --err:#ff6b6b; }
+  html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1100px;margin:24px auto;padding:16px}
+  h1{font-size:clamp(1.25rem,2.7vw,1.8rem);margin:0 0 6px}
+  p.lead{color:var(--muted);margin:.25rem 0 1rem}
+  .card{background:var(--panel);border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.35);padding:16px;margin-bottom:16px}
+  .card h2{font-size:1.1rem;margin:.2rem 0 .6rem}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .hint{color:var(--muted)}
+  input[type=number], input[type=range], input[type=text]{background:#0f1530;border:1px solid #2b3565;border-radius:10px;color:var(--ink);padding:8px 10px}
+  input[type=number]{width:90px}
+  input[type=range]{width:260px}
+  button{appearance:none;border:none;border-radius:12px;padding:10px 14px;background:#21305a;color:#e8efff;font-weight:700;cursor:pointer}
+  button.primary{background:linear-gradient(180deg,#6ea8fe,#3f67e6)}
+  .pill{background:#1a2550;border:1px solid #344473;color:#d8e4ff;border-radius:10px;padding:6px 10px;display:inline-block}
+  .box{background:#111738;border:1px solid #313b66;border-radius:12px;padding:12px}
+  svg{max-width:100%}
+  .hr{height:1px;background:linear-gradient(90deg,transparent,#33406a,transparent);margin:14px 0}
+  .mcq{display:grid;gap:16px}
+  .option{display:flex;gap:10px;align-items:center;padding:8px;border:1px solid #2b3565;border-radius:10px;background:#0f1530;cursor:pointer}
+  .correct{outline:2px solid var(--ok)}
+  .wrong{outline:2px solid var(--err)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Percent Explorer</h1>
+  <p class="lead">Just percentages. Use the <strong>double number line</strong>, the <strong>tape diagram</strong>, and the <strong>sale price steps</strong>. Finish with a short quiz.</p>
+
+  <!-- Section 1: Double Number Line -->
+  <section class="card" id="dnl">
+    <h2>1) Double Number Line: What is P% of a Whole?</h2>
+    <p class="hint">Top line is % (0Ð100). Bottom line is the amount from 0 to the whole. Slide the percent to see the part.</p>
+    <div class="row">
+      <label>Whole</label>
+      <input type="number" id="d_whole" value="60" min="0" step="1">
+      <label>Percent</label>
+      <input type="range" id="d_p" min="0" max="100" value="25">
+      <input type="number" id="d_p_num" min="0" max="100" value="25">
+      <span class="pill">P% of Whole = <span id="d_value">15</span></span>
+      <button class="primary" id="d_tick">Add 10% ticks</button>
+    </div>
+    <div class="box" id="d_canvas"></div>
+  </section>
+
+  <!-- Section 2: Tape Diagram -->
+  <section class="card" id="tape">
+    <h2>2) Tape Diagram: Part, Percent, Whole</h2>
+    <p class="hint">Enter any two, and the third is solved. The tape shows the percent shaded.</p>
+    <div class="row">
+      <label>Whole</label><input type="number" id="t_whole" value="80" min="0">
+      <label>Percent (%)</label><input type="number" id="t_percent" value="35" min="0" max="100">
+      <label>Part</label><input type="number" id="t_part" value="28" min="0">
+      <button class="primary" id="t_solve">Solve Missing</button>
+    </div>
+    <div class="box" id="t_canvas"></div>
+    <p class="hint" id="t_explain"></p>
+  </section>
+
+  <!-- Section 3: Sale vs Original Price (Discount and Tax) -->
+  <section class="card" id="percent">
+    <h2>3) Sale Price vs. Original Price</h2>
+    <p class="hint">Steps for finding a discount and the final price. Visuals reinforce the idea that a discount percent takes away part of the whole.</p>
+    <div class="row">
+      <label>Original price ($)</label><input type="number" id="p_orig" min="0" step="0.01" value="80">
+      <label>Discount (%)</label><input type="number" id="p_disc" min="0" max="100" step="1" value="25">
+      <label>Tax (%)</label><input type="number" id="p_tax" min="0" step="0.1" value="8">
+      <button class="primary" id="p_calc">Calculate</button>
+      <span class="pill">Sale price: $<span id="p_sale">60.00</span> | Final price with tax: $<span id="p_final">64.80</span></span>
+    </div>
+
+    <div class="box">
+      <strong>Step?by?Step</strong>
+      <ol id="p_steps" style="margin:8px 0 0 18px; line-height:1.6">
+        <li>Find the discount amount: <span class="pill">discount = original * (discount%/100)</span> ? $<span id="p_s1">20.00</span></li>
+        <li>Subtract to get the sale price: <span class="pill">sale = original ? discount</span> ? $<span id="p_s2">60.00</span></li>
+        <li>Find tax on the sale price: <span class="pill">tax = sale * (tax%/100)</span> ? $<span id="p_s3">4.80</span></li>
+        <li>Final price (pay this amount): <span class="pill">final = sale + tax</span> ? $<span id="p_s4">64.80</span></li>
+      </ol>
+      <p class="hint">Concept check: A <strong>25%</strong> discount means you pay <strong>75%</strong> of the original. So <span class="pill">sale = 0.75 * original</span>.</p>
+    </div>
+
+    <div class="cols" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+      <div class="box">
+        <strong>Double Number Line (Discount)</strong>
+        <div id="p_dnl" style="margin-top:6px"></div>
+      </div>
+      <div class="box">
+        <strong>Tape Diagram (What part is discounted?)</strong>
+        <div id="p_tape" style="margin-top:6px"></div>
+        <p class="hint" id="p_explain">25% of $80 = $20 (discount). Unshaded 75% shows the $60 you pay before tax.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: Quick Quiz (MCQ) -->
+  <section class="card" id="quiz">
+    <h2>4) Quick Check (Multiple Choice)</h2>
+    <div class="mcq">
+      <div class="box">
+        <p><strong>Q1.</strong> On a double number line, 100% matches 80. What number matches 25%?</p>
+        <label class="option"><input type="radio" name="q1" value="10"> 10</label>
+        <label class="option"><input type="radio" name="q1" value="15"> 15</label>
+        <label class="option"><input type="radio" name="q1" value="20"> 20</label>
+        <label class="option"><input type="radio" name="q1" value="25"> 25</label>
+      </div>
+      <div class="box">
+        <p><strong>Q2.</strong> 40% of 90 is É</p>
+        <label class="option"><input type="radio" name="q2" value="32"> 32</label>
+        <label class="option"><input type="radio" name="q2" value="36"> 36</label>
+        <label class="option"><input type="radio" name="q2" value="45"> 45</label>
+        <label class="option"><input type="radio" name="q2" value="60"> 60</label>
+      </div>
+      <div class="box">
+        <p><strong>Q3.</strong> If 18 is 30% of a number, the number is É</p>
+        <label class="option"><input type="radio" name="q3" value="48"> 48</label>
+        <label class="option"><input type="radio" name="q3" value="54"> 54</label>
+        <label class="option"><input type="radio" name="q3" value="60"> 60</label>
+        <label class="option"><input type="radio" name="q3" value="72"> 72</label>
+      </div>
+      <div class="box">
+        <p><strong>Q4.</strong> A tape diagram shows a bar split into 20 equal parts. 7 parts are shaded. What percent is shaded?</p>
+        <label class="option"><input type="radio" name="q4" value="20"> 20%</label>
+        <label class="option"><input type="radio" name="q4" value="30"> 30%</label>
+        <label class="option"><input type="radio" name="q4" value="35"> 35%</label>
+        <label class="option"><input type="radio" name="q4" value="40"> 40%</label>
+      </div>
+      <div class="box">
+        <p><strong>Q5.</strong> A store shows Ò25% off, then 8% tax after the discount.Ó If the original price is $80, the final price is closest to É</p>
+        <label class="option"><input type="radio" name="q5" value="60"> $60.00</label>
+        <label class="option"><input type="radio" name="q5" value="64.8"> $64.80</label>
+        <label class="option"><input type="radio" name="q5" value="68.4"> $68.40</label>
+        <label class="option"><input type="radio" name="q5" value="86.4"> $86.40</label>
+      </div>
+      <div class="row">
+        <button class="primary" id="q_check">Check Answers</button>
+        <span id="q_score" class="pill" style="margin-left:auto">Score: 0 / 5</span>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+// ===== Helpers =====
+const el = id => document.getElementById(id);
+const fmt = x => (Math.round(x*100)/100).toString();
+
+// ===== Double Number Line =====
+let showTicks = false;
+function drawDNL(){
+  const W = Math.max(0,+el('d_whole').value||0);
+  const P = Math.max(0,Math.min(100,+el('d_p').value||0));
+  el('d_p_num').value = P; // sync
+  const value = W * (P/100);
+  el('d_value').textContent = fmt(value);
+
+  const width = 900, height = 160, margin = 40;
+  let svg = '';
+  // Lines
+  svg += `<line x1="${margin}" y1="40" x2="${width-margin}" y2="40" stroke="#4e5d93" stroke-width="3"/>`;
+  svg += `<line x1="${margin}" y1="110" x2="${width-margin}" y2="110" stroke="#4e5d93" stroke-width="3"/>`;
+  // Labels
+  svg += `<text x="${margin-30}" y="40" fill="#aab4d6">% </text>`;
+  svg += `<text x="${margin-30}" y="110" fill="#aab4d6">Amt</text>`;
+
+  function tick(x,y,label){
+    svg += `<line x1="${x}" y1="${y-6}" x2="${x}" y2="${y+6}" stroke="#aab4d6"/>`;
+    svg += `<text x="${x-12}" y="${y-10}" fill="#aab4d6" font-size="12">${label}</text>`;
+  }
+
+  // 0 and 100%
+  tick(margin,40,'0%'); tick(width-margin,40,'100%');
+  tick(margin,110,'0'); tick(width-margin,110,fmt(W));
+
+  if(showTicks){
+    for(let p=10;p<100;p+=10){
+      const x = margin + (p/100)*(width-2*margin);
+      tick(x,40,`${p}%`);
+      tick(x,110,fmt(W*(p/100)));
+    }
+  }
+
+  // Marker for chosen percent
+  const xP = margin + (P/100)*(width-2*margin);
+  svg += `<line x1="${xP}" y1="25" x2="${xP}" y2="125" stroke="#6ea8fe" stroke-width="3"/>`;
+  svg += `<circle cx="${xP}" cy="40" r="6" fill="#6ea8fe"/>`;
+  svg += `<circle cx="${xP}" cy="110" r="6" fill="#6ea8fe"/>`;
+  svg += `<text x="${xP+8}" y="38" fill="#d8e4ff">${P}%</text>`;
+  svg += `<text x="${xP+8}" y="114" fill="#d8e4ff">${fmt(value)}</text>`;
+
+  el('d_canvas').innerHTML = `<svg viewBox="0 0 ${width} ${height}" width="100%" height="auto">${svg}</svg>`;
+}
+
+el('d_p').addEventListener('input', drawDNL);
+el('d_p_num').addEventListener('input', e=>{ el('d_p').value = e.target.value; drawDNL(); });
+el('d_whole').addEventListener('input', drawDNL);
+el('d_tick').addEventListener('click',()=>{ showTicks=!showTicks; el('d_tick').textContent = showTicks? 'Hide 10% ticks' : 'Add 10% ticks'; drawDNL();});
+drawDNL();
+
+// ===== Tape Diagram =====
+function drawTape(){
+  let whole = +el('t_whole').value||0;
+  let percent = +el('t_percent').value||0;
+  let part = +el('t_part').value||0;
+
+  // Solve missing value when at least two are provided
+  const known = [whole>0, percent>0, part>0].filter(Boolean).length;
+  if(known>=2){
+    if(whole>0 && percent>0 && (!part || part===0)) part = whole * (percent/100);
+    else if(whole>0 && part>0 && (!percent || percent===0)) percent = (part/whole)*100;
+    else if(percent>0 && part>0 && (!whole || whole===0)) whole = part/(percent/100);
+  }
+
+  el('t_whole').value = fmt(whole);
+  el('t_percent').value = Math.round(percent);
+  el('t_part').value = fmt(part);
+
+  // Diagram
+  const width = 900, height = 90, margin = 10;
+  const shadedW = (Math.min(100,Math.max(0,percent))/100) * (width-2*margin);
+  let svg = '';
+  svg += `<rect x="${margin}" y="20" width="${width-2*margin}" height="40" rx="8" fill="#0f1530" stroke="#3c4a7a"/>`;
+  svg += `<rect x="${margin+2}" y="22" width="${Math.max(0,shadedW-4)}" height="36" fill="#3557e0"/>`;
+  svg += `<text x="${margin}" y="76" fill="#aab4d6">${Math.round(percent)}% shaded ? part = ${fmt(part)} of whole = ${fmt(whole)}</text>`;
+  el('t_canvas').innerHTML = `<svg viewBox="0 0 ${width} ${height}" width="100%">${svg}</svg>`;
+
+  // Explanation
+  let explain = '';
+  if(whole && percent && part){
+    explain = `We use: part = (percent/100) * whole.  So ${fmt(part)} = (${Math.round(percent)}/100) * ${fmt(whole)}.`;
+  }
+  el('t_explain').textContent = explain;
+}
+
+el('t_solve').addEventListener('click', drawTape);
+drawTape();
+
+// ===== Sale Price Section =====
+(function(){
+  const $ = id => document.getElementById(id);
+  const _fmt = x => (Math.round(x*100)/100).toFixed(2);
+  function calc(){
+    const orig = Math.max(0, +$('p_orig').value||0);
+    const disc = Math.max(0, Math.min(100, +$('p_disc').value||0));
+    const tax  = Math.max(0, +$('p_tax').value||0);
+    const discAmt = orig * (disc/100);
+    const sale = orig - discAmt;
+    const taxAmt = sale * (tax/100);
+    const final = sale + taxAmt;
+    $('p_s1').textContent = _fmt(discAmt);
+    $('p_s2').textContent = _fmt(sale);
+    $('p_s3').textContent = _fmt(taxAmt);
+    $('p_s4').textContent = _fmt(final);
+    $('p_sale').textContent = _fmt(sale);
+    $('p_final').textContent = _fmt(final);
+    drawDiscountDNL(orig, disc, discAmt);
+    drawDiscountTape(orig, disc);
+    $('p_explain').textContent = `${disc}% of $${_fmt(orig)} = $${_fmt(discAmt)} (discount). Unshaded ${_fmt(100-disc)}% shows the $${_fmt(sale)} you pay before tax.`;
+  }
+  function drawDiscountDNL(whole, pct, part){
+    const width=900, height=160, m=40; let svg='';
+    svg += `<line x1="${m}" y1="40" x2="${width-m}" y2="40" stroke="#4e5d93" stroke-width="3"/>`;
+    svg += `<line x1="${m}" y1="110" x2="${width-m}" y2="110" stroke="#4e5d93" stroke-width="3"/>`;
+    function tick(x,y,label){ svg += `<line x1="${x}" y1="${y-6}" x2="${x}" y2="${y+6}" stroke="#aab4d6"/>`;
+      svg += `<text x="${x-14}" y="${y-10}" fill="#aab4d6" font-size="12">${label}</text>`; }
+    tick(m,40,'0%'); tick(width-m,40,'100%'); tick(m,110,'$0'); tick(width-m,110,`$${_fmt(whole)}`);
+    [25,50,75].forEach(p=>{ const x=m+(p/100)*(width-2*m); tick(x,40,`${p}%`); tick(x,110,`$${_fmt(whole*(p/100))}`); });
+    const xP = m + (pct/100)*(width-2*m);
+    svg += `<line x1="${xP}" y1="25" x2="${xP}" y2="125" stroke="#6ea8fe" stroke-width="3"/>`;
+    svg += `<circle cx="${xP}" cy="40" r="6" fill="#6ea8fe"/>`;
+    svg += `<circle cx="${xP}" cy="110" r="6" fill="#6ea8fe"/>`;
+    svg += `<text x="${xP+8}" y="38" fill="#d8e4ff">${pct}%</text>`;
+    svg += `<text x="${xP+8}" y="114" fill="#d8e4ff">$${_fmt(part)}</text>`;
+    $('p_dnl').innerHTML = `<svg viewBox="0 0 ${width} ${height}" width="100%">${svg}</svg>`;
+  }
+  function drawDiscountTape(whole, pct){
+    const width=900, height=90, m=10; const full = width-2*m; const shade = Math.max(0,Math.min(100,pct))/100*full;
+    let svg='';
+    svg += `<rect x="${m}" y="20" width="${full}" height="40" rx="8" fill="#0f1530" stroke="#3c4a7a"/>`;
+    svg += `<rect x="${m+2}" y="22" width="${Math.max(0,shade-4)}" height="36" fill="#3557e0"/>`;
+    svg += `<text x="${m}" y="76" fill="#aab4d6">${pct}% off (shaded). You pay ${_fmt(100-pct)}% of $${_fmt(whole)}.</text>`;
+    $('p_tape').innerHTML = `<svg viewBox="0 0 ${width} ${height}" width="100%">${svg}</svg>`;
+  }
+  el('p_calc').addEventListener('click', calc);
+  calc();
+})();
+
+// ===== Quiz =====
+function checkQuiz(){
+  let score=0;
+  const ans = {q1:'20', q2:'36', q3:'60', q4:'35', q5:'64.8'}; // keys
+  for(const q of Object.keys(ans)){
+    const sel = document.querySelector(`input[name=${q}]:checked`);
+    const boxes = [...document.querySelectorAll(`input[name=${q}]`)].map(x=>x.closest('.option'));
+    boxes.forEach(b=>{ b.classList.remove('correct','wrong'); });
+    if(!sel){ continue; }
+    const parent = sel.closest('.option');
+    if(sel.value===ans[q]){ score++; parent.classList.add('correct'); }
+    else{ parent.classList.add('wrong'); const correct = document.querySelector(`input[name=${q}][value="${ans[q]}"]`).closest('.option'); correct.classList.add('correct'); }
+  }
+  el('q_score').textContent = `Score: ${score} / 5`;
+}
+
+document.getElementById('q_check').addEventListener('click', checkQuiz);
+</script>
+</body>
+</html>

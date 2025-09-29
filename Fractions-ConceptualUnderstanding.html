@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mixed Numbers Explorer  Visual Fractions & Division</title>
+<style>
+  :root{
+    --bg:#0b1020; --panel:#141a33; --ink:#eef3ff; --muted:#aab4d6; --accent:#6ea8fe; --ok:#2bd3a3; --warn:#ffd166; --err:#ff6b6b;
+  }
+  html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1100px;margin:24px auto;padding:16px}
+  h1{font-size:clamp(1.25rem,2.7vw,1.8rem);margin:0 0 6px}
+  p.lead{color:var(--muted);margin:.25rem 0 1rem}
+  .grid{display:grid;gap:16px;grid-template-columns:1.15fr .85fr}
+  @media (max-width: 980px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.35);padding:14px}
+  .card h2{font-size:1.05rem;margin:.2rem 0 .6rem}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  label{color:var(--muted)}
+  input[type=number]{width:78px;background:#0f1530;border:1px solid #2b3565;border-radius:10px;color:var(--ink);padding:8px 10px}
+  button{appearance:none;border:none;border-radius:12px;padding:10px 14px;background:#21305a;color:#e8efff;font-weight:700;cursor:pointer}
+  button.primary{background:linear-gradient(180deg,#6ea8fe,#3f67e6)}
+  button.good{background:linear-gradient(180deg,#35d7a9,#14b78b)}
+  button.warn{background:linear-gradient(180deg,#ffd166,#ffb703);color:#1a1a1a}
+  .pill{background:#1a2550;border:1px solid #344473;color:#d8e4ff;border-radius:10px;padding:6px 10px;display:inline-block}
+  .math{font-family:ui-monospace,Menlo,Consolas,monospace;color:#d8e4ff}
+  .cols{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .box{background:#111738;border:1px solid #313b66;border-radius:12px;padding:10px}
+  svg{max-width:100%}
+  .hint{color:#b9c3e6}
+  .check{padding:8px 10px;border-radius:10px}
+  .check.ok{background:#143a2e;color:#9ff4ce;border:1px solid #2bd3a3}
+  .check.bad{background:#3a1717;color:#ffd5d5;border:1px solid #ff6b6b}
+  .hr{height:1px;background:linear-gradient(90deg,transparent,#33406a,transparent);margin:12px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Mixed Numbers Explorer</h1>
+  <p class="lead">Help students <strong>see</strong> fractions. Build tape diagrams, convert mixed numbers to improper fractions, and divide mixed numbers with step-by-step visuals.</p>
+  <div class="grid">
+    <section class="card" id="visual">
+      <h2>1) Build a Fraction Visually</h2>
+      <div class="row">
+        <label>Wholes</label>
+        <input type="number" id="v_whole" min="0" value="1">
+        <label>Numerator</label>
+        <input type="number" id="v_num" min="0" value="1">
+        <label>Denominator</label>
+        <input type="number" id="v_den" min="1" value="4">
+        <button class="primary" id="v_draw">Draw</button>
+      </div>
+      <p class="hint">This makes a mixed number of <span class="math" id="v_mixed">1 1/4</span>. Each bar is partitioned into equal parts (denominator). Shaded parts show the numerator.</p>
+      <div class="box" id="v_canvas"></div>
+      <div class="hr"></div>
+      <h2>2) Convert Mixed  Improper (Concept + Computation)</h2>
+      <div class="row">
+        <label>Whole</label><input type="number" id="c_whole" min="0" value="2">
+        <label>Numerator</label><input type="number" id="c_num" min="0" value="3">
+        <label>Denominator</label><input type="number" id="c_den" min="1" value="5">
+        <button class="primary" id="c_go">Convert</button>
+      </div>
+      <div class="cols">
+        <div class="box">
+          <strong>Idea (why it works)</strong>
+          <p class="hint">A whole contains <span class="math">denominator</span> parts. So <span class="math">W</span> wholes contain <span class="math">W*d</span> parts. Add the extra numerator parts.</p>
+          <div id="c_why" class="pill">&nbsp;</div>
+          <div id="c_tape" style="margin-top:8px"></div>
+        </div>
+        <div class="box">
+          <strong>Calculation</strong>
+          <p class="math" id="c_work">(2 * 5 + 3) / 5 = 13/5</p>
+          <p>Improper fraction: <span class="pill" id="c_ans">13/5</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="division">
+      <h2>3) Divide Mixed Numbers</h2>
+      <p class="hint">We will convert to improper, then use the algorithm Keep  Change  Flip. Follow each step.</p>
+      <div class="row">
+        <span class="pill">(Dividend) A =</span>
+        <input type="number" id="a_w" min="0" value="1"> <span>whole</span>
+        <input type="number" id="a_n" min="0" value="1"> <span>/</span>
+        <input type="number" id="a_d" min="1" value="2">
+      </div>
+      <div class="row">
+        <span class="pill">(Divisor) B =</span>
+        <input type="number" id="b_w" min="0" value="0"> <span>whole</span>
+        <input type="number" id="b_n" min="0" value="3"> <span>/</span>
+        <input type="number" id="b_d" min="1" value="4">
+      </div>
+      <div class="row">
+        <button class="primary" id="d_go">Divide A &divide; B</button>
+        <button id="d_rand" class="warn">Random Practice</button>
+      </div>
+      <div class="box" id="d_steps">
+        <div><strong>Step 1. Convert to improper:</strong><br><span class="math" id="d_imp"></span></div>
+        <div><strong>Step 2. Keep  Change  Flip:</strong> <span class="math" id="d_kcf"></span></div>
+        <div><strong>Step 3. Cross-simplify (if possible):</strong> <span class="math" id="d_simplify"></span></div>
+        <div><strong>Step 4. Multiply numerators & denominators:</strong> <span class="math" id="d_mul"></span></div>
+        <div><strong>Step 5. Final Answer (simplify and mixed form):</strong> <span class="math" id="d_final"></span></div>
+        <div class="hr"></div>
+        <div id="d_canvas"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+const gcd = (a,b)=> b?gcd(b,a%b):Math.abs(a);
+const toImproper = (w,n,d)=>({n:w*d+n, d});
+const toMixed = (n,d)=>({w:Math.trunc(n/d), n:Math.abs(n)%d, d});
+const fracStr = (n,d)=>`${n}/${d}`;
+const mixedStr = (w,n,d)=> n?`${w} ${n}/${d}`:`${w}`;
+const simplify = (n,d)=>{const g=gcd(n,d); return {n:n/g, d:d/g}};
+function el(id){return document.getElementById(id)}
+
+function drawTape(container, wholes, num, den){
+  wholes = Math.max(0, wholes|0);
+  num = Math.max(0, num|0);
+  den = Math.max(1, den|0);
+  const width = 800, barH = 36, gap=8; 
+  const totalBars = (wholes>0?wholes:0) + (num>0?1:(wholes===0?1:0));
+  const svgParts=[];
+  el('v_mixed').textContent = `${wholes} ${num}/${den}`;
+  let shadedLeft = wholes*den + num;
+  let y=0;
+  for(let b=0;b<totalBars;b++){
+    const partW=width/den;
+    svgParts.push(`<rect x="0" y="${y}" width="${width}" height="${barH}" rx="8" fill="#0f1530" stroke="#3c4a7a"/>`);
+    for(let p=0;p<den;p++){
+      let fill = '#1b2550';
+      if(shadedLeft>0){fill='#3557e0'; shadedLeft--;}
+      svgParts.push(`<rect x="${p*partW+1}" y="${y+1}" width="${partW-2}" height="${barH-2}" fill="${fill}"/>`);
+    }
+    y+=barH+gap;
+  }
+  container.innerHTML = `<svg viewBox="0 0 ${width} ${y+40}" width="100%">${svgParts.join('')}</svg>`;
+}
+
+el('v_draw').addEventListener('click',()=>{
+  drawTape(el('v_canvas'),+el('v_whole').value,+el('v_num').value,+el('v_den').value);
+});
+drawTape(el('v_canvas'),1,1,4);
+
+function drawConversion(){
+  const W=+el('c_whole').value|0,N=+el('c_num').value|0,D=Math.max(1,+el('c_den').value|0);
+  const imp=toImproper(W,N,D);
+  el('c_work').textContent = `(${W} * ${D} + ${N}) / ${D} = ${imp.n}/${imp.d}`;
+  el('c_ans').textContent = fracStr(imp.n,imp.d);
+  el('c_why').innerHTML = `${W} whole(s) * ${D} parts = ${W*D}. Add ${N} more = ${W*D+N} parts total.`;
+  drawTape(el('c_tape'),Math.max(W,0),N,D);
+}
+el('c_go').addEventListener('click',drawConversion);
+drawConversion();
+
+function doDivision(){
+  const A={w:+el('a_w').value|0,n:+el('a_n').value|0,d:Math.max(1,+el('a_d').value|0)};
+  const B={w:+el('b_w').value|0,n:+el('b_n').value|0,d:Math.max(1,+el('b_d').value|0)};
+  const Ai=toImproper(A.w,A.n,A.d), Bi=toImproper(B.w,B.n,B.d);
+  el('d_imp').innerHTML=`A: ${mixedStr(A.w,A.n,A.d)} = ${Ai.n}/${Ai.d}<br>B: ${mixedStr(B.w,B.n,B.d)} = ${Bi.n}/${Bi.d}`;
+  el('d_kcf').textContent=`Keep ${Ai.n}/${Ai.d}, change division to multiplication, flip to ${Bi.d}/${Bi.n}`;
+  const g1=gcd(Ai.n,Bi.n), g2=gcd(Ai.d,Bi.d);
+  const n1=Ai.n/g1,d1=Ai.d/g2,n2=Bi.d/g2,d2=Bi.n/g1;
+  el('d_simplify').textContent=`After simplifying: ${n1}/${d1} * ${n2}/${d2}`;
+  const prodN=n1*n2, prodD=d1*d2, simp=simplify(prodN,prodD);
+  el('d_mul').textContent=`Multiply: ${n1}*${n2} = ${prodN}, ${d1}*${d2} = ${prodD}`;
+  const mix=toMixed(simp.n,simp.d);
+  el('d_final').textContent=`Final simplified fraction: ${simp.n}/${simp.d} = ${mixedStr(mix.w,mix.n,mix.d)}`;
+}
+el('d_go').addEventListener('click',doDivision);
+doDivision();
+</script>
+</body>
+</html>

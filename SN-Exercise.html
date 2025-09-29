@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Drag & Drop: Match Each Step with the Correct Description</title>
+<style>
+  :root{
+    --bg:#0b1020; --card:#141a33; --ink:#e9edf7; --muted:#a9b3d3; --accent:#6ea8fe; --ok:#27c498; --bad:#ff6b6b; --drop:#243156; --shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+  html,body{background:var(--bg); color:var(--ink); font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin:0}
+  .wrap{max-width:1200px; margin:24px auto; padding:24px}
+  h1{font-size:clamp(1.2rem, 2.8vw, 1.8rem); margin:0 0 8px}
+  p.topnote{color:var(--muted); margin:.25rem 0 1.2rem}
+
+  .grid{display:grid; grid-template-columns: 1.2fr .8fr; gap:24px}
+  .card{background:var(--card); border-radius:16px; padding:20px; box-shadow:var(--shadow)}
+  .head{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px}
+  .head h2{font-size:1.1rem; margin:0}
+
+  .row{display:grid; grid-template-columns: 48px 1fr 240px; gap:16px; align-items:center; padding:12px 14px; border-radius:12px; margin-bottom:10px; background:rgba(255,255,255,0.02)}
+  .row .stepnum{width:48px; height:48px; display:grid; place-items:center; border-radius:12px; background:var(--drop); color:#cfe0ff; font-weight:700; font-size:1.1rem}
+  code.expr{font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:1rem; color:#d7e3ff; white-space:nowrap}
+
+  /* Drop zones */
+  .drop{min-height:60px; border:2px dashed #3a4a7a; background:linear-gradient(180deg, #1b2444 0, #17203d); border-radius:12px; display:flex; justify-content:center; align-items:center; padding:6px 12px; font-size:.95rem; color:var(--muted); text-align:center}
+  .drop.filled{border-style:solid; border-color:#4c70ff; background:#1a2550}
+  .drop.correct{outline:3px solid var(--ok); outline-offset:2px}
+  .drop.wrong{outline:3px solid var(--bad); outline-offset:2px}
+
+  /* Draggables */
+  .bank{display:flex; flex-direction:column; gap:12px}
+  .chip{user-select:none; cursor:grab; background:#1a2446; border:1px solid #31406c; color:#e9f0ff; border-radius:12px; padding:12px 14px; box-shadow:var(--shadow); display:flex; gap:12px; align-items:flex-start; font-size:.95rem}
+  .chip:active{cursor:grabbing}
+  .tag{flex:0 0 auto; font-weight:800; width:32px; height:32px; display:grid; place-items:center; border-radius:10px; background:var(--accent); color:#081129}
+  .chip[data-placed="true"]{opacity:.75}
+
+  .controls{display:flex; flex-wrap:wrap; gap:12px; margin-top:16px}
+  button{appearance:none; border:none; background:#23305b; color:#e9f0ff; padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:700; font-size:.95rem}
+  button.primary{background:linear-gradient(180deg, #5b86ff, #3d62de)}
+  button.warn{background:linear-gradient(180deg, #ff7a7a, #e74c4c)}
+  .score{margin-left:auto; color:#cfe0ff; font-weight:700; font-size:.95rem}
+  .key{margin-top:10px; color:var(--muted); font-size:.9rem}
+
+  @media (max-width: 960px){
+    .grid{grid-template-columns: 1fr;}
+    .row{grid-template-columns:48px 1fr;}
+    .row .drop{grid-column: 1 / -1; margin-top:8px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Match Each Step with the Correct Description (Drag & Drop)</h1>
+  <p class="topnote">Drag a description tile from the right onto each step. Use <em>Check</em> to score your matches, or <em>Show Answers</em> to reveal the key.</p>
+  <div class="grid">
+    <!-- LEFT: Steps -->
+    <section class="card" aria-labelledby="steps-title">
+      <div class="head">
+        <h2 id="steps-title">Steps</h2>
+        <span style="color:var(--muted); font-size:.95rem">Starting expression: <code class="expr">(2.4 * 10^3) * (7.1 * 10^3)</code></span>
+      </div>
+      <div id="steps">
+        <div class="row" data-step="1" data-answer="D">
+          <div class="stepnum">1</div>
+          <div><code class="expr">= 2.4 * 7.1 * 10^3 * 10^3</code></div>
+          <div class="drop" aria-label="Drop description for step 1" tabindex="0">Drop here</div>
+        </div>
+        <div class="row" data-step="2" data-answer="F">
+          <div class="stepnum">2</div>
+          <div><code class="expr">= (2.4 * 7.1) * (10^3 * 10^3)</code></div>
+          <div class="drop" aria-label="Drop description for step 2" tabindex="0">Drop here</div>
+        </div>
+        <div class="row" data-step="3" data-answer="E">
+          <div class="stepnum">3</div>
+          <div><code class="expr">= 17.04 * 10^6</code></div>
+          <div class="drop" aria-label="Drop description for step 3" tabindex="0">Drop here</div>
+        </div>
+        <div class="row" data-step="4" data-answer="C">
+          <div class="stepnum">4</div>
+          <div><code class="expr">= 1.704 * 10^1 * 10^6</code></div>
+          <div class="drop" aria-label="Drop description for step 4" tabindex="0">Drop here</div>
+        </div>
+        <div class="row" data-step="5" data-answer="B">
+          <div class="stepnum">5</div>
+          <div><code class="expr">= 1.704 * 10^7</code></div>
+          <div class="drop" aria-label="Drop description for step 5" tabindex="0">Drop here</div>
+        </div>
+        <div class="row" data-step="6" data-answer="A">
+          <div class="stepnum">6</div>
+          <div><code class="expr">= 17,040,000</code></div>
+          <div class="drop" aria-label="Drop description for step 6" tabindex="0">Drop here</div>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="primary" id="checkBtn">Check</button>
+        <button id="resetBtn">Reset</button>
+        <button class="warn" id="showBtn">Show Answers</button>
+        <div class="score" id="score">Score: 0 / 6</div>
+      </div>
+      <div class="key">Answer key mapping: 1?D, 2?F, 3?E, 4?C, 5?B, 6?A</div>
+    </section>
+
+    <!-- RIGHT: Bank of descriptions -->
+    <aside class="card" aria-labelledby="bank-title">
+      <div class="head"><h2 id="bank-title">Description Tiles</h2></div>
+      <div id="bank" class="bank" aria-live="polite">
+        <div class="chip" draggable="true" data-id="A" role="button" aria-label="A. Write in standard form."><div class="tag">A</div><div>Write in standard form.</div></div>
+        <div class="chip" draggable="true" data-id="B" role="button" aria-label="B. Product of Powers Property"><div class="tag">B</div><div>Product of Powers Property</div></div>
+        <div class="chip" draggable="true" data-id="C" role="button" aria-label="C. Write in scientific notation."><div class="tag">C</div><div>Write in scientific notation.</div></div>
+        <div class="chip" draggable="true" data-id="D" role="button" aria-label="D. Commutative Property of Multiplication"><div class="tag">D</div><div>Commutative Property of Multiplication</div></div>
+        <div class="chip" draggable="true" data-id="E" role="button" aria-label="E. Simplify."><div class="tag">E</div><div>Simplify.</div></div>
+        <div class="chip" draggable="true" data-id="F" role="button" aria-label="F. Associative Property of Multiplication"><div class="tag">F</div><div>Associative Property of Multiplication</div></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+// JS remains unchanged
+(function(){
+  const bank = document.getElementById('bank');
+  const drops = [...document.querySelectorAll('.drop')];
+  const scoreEl = document.getElementById('score');
+  const checkBtn = document.getElementById('checkBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const showBtn = document.getElementById('showBtn');
+
+  function updateScore(showFeedback=false){
+    let correct = 0;
+    drops.forEach(d => {
+      d.classList.remove('correct','wrong');
+      const ans = d.closest('.row').dataset.answer;
+      const tile = d.querySelector('.chip');
+      if(tile){
+        const id = tile.dataset.id;
+        if(id === ans){
+          correct++;
+          if(showFeedback) d.classList.add('correct');
+        }else if(showFeedback){
+          d.classList.add('wrong');
+        }
+      }
+    });
+    scoreEl.textContent = `Score: ${correct} / 6`;
+    return correct;
+  }
+
+  function resetAll(){
+    drops.forEach(d => {
+      d.classList.remove('filled','correct','wrong');
+      const chip = d.querySelector('.chip');
+      if(chip){ bank.appendChild(chip); chip.dataset.placed = 'false'; }
+      d.textContent = 'Drop here';
+    });
+    scoreEl.textContent = 'Score: 0 / 6';
+  }
+
+  function showAnswers(){
+    resetAll();
+    const chipById = Object.fromEntries([...bank.querySelectorAll('.chip')].map(c => [c.dataset.id, c]));
+    drops.forEach(d => {
+      const ans = d.closest('.row').dataset.answer;
+      const chip = chipById[ans];
+      if(chip){ d.textContent=''; d.appendChild(chip); chip.dataset.placed='true'; d.classList.add('filled'); }
+    });
+    updateScore(true);
+  }
+
+  let dragged = null;
+  bank.addEventListener('dragstart', e => {
+    const chip = e.target.closest('.chip');
+    if(!chip) return;
+    dragged = chip; e.dataTransfer.setData('text/plain', chip.dataset.id);
+    setTimeout(()=> chip.classList.add('dragging'),0);
+  });
+  document.addEventListener('dragend', e => {
+    const chip = e.target.closest('.chip');
+    if(chip) chip.classList.remove('dragging');
+    dragged = null;
+  });
+
+  document.addEventListener('dragstart', e => {
+    const chip = e.target.closest('.chip');
+    if(!chip) return;
+    dragged = chip; e.dataTransfer.setData('text/plain', chip.dataset.id);
+  });
+
+  drops.forEach(zone => {
+    zone.addEventListener('dragover', e => { e.preventDefault(); });
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      if(!dragged) return;
+      const existing = zone.querySelector('.chip');
+      if(existing) bank.appendChild(existing);
+      zone.textContent='';
+      zone.appendChild(dragged);
+      dragged.dataset.placed='true';
+      zone.classList.add('filled');
+      zone.classList.remove('correct','wrong');
+      updateScore(false);
+    });
+    zone.addEventListener('keydown', e => {
+      if(e.key==='Enter'){
+        const firstFree = bank.querySelector('.chip');
+        if(firstFree){
+          const existing = zone.querySelector('.chip');
+          if(existing) bank.appendChild(existing);
+          zone.textContent='';
+          zone.appendChild(firstFree);
+          firstFree.dataset.placed='true';
+          zone.classList.add('filled');
+          updateScore(false);
+        }
+      }
+    });
+  });
+
+  bank.addEventListener('dragover', e => e.preventDefault());
+  bank.addEventListener('drop', e => {
+    e.preventDefault();
+    if(!dragged) return;
+    const parentDrop = dragged.closest('.drop');
+    if(parentDrop){
+      parentDrop.classList.remove('filled','correct','wrong');
+      parentDrop.textContent='Drop here';
+    }
+    bank.appendChild(dragged);
+    dragged.dataset.placed='false';
+    updateScore(false);
+  });
+
+  checkBtn.addEventListener('click', () => updateScore(true));
+  resetBtn.addEventListener('click', resetAll);
+  showBtn.addEventListener('click', showAnswers);
+})();
+</script>
+</body>
+</html>

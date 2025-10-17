@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Equivalence Explorer Ð Percents ? Fractions ? Decimals</title>
+<style>
+  :root{ --bg:#0b1020; --panel:#141a33; --ink:#eef3ff; --muted:#aab4d6; --accent:#6ea8fe; --ok:#2bd3a3; --warn:#ffd166; }
+  html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:1100px;margin:24px auto;padding:16px}
+  h1{font-size:clamp(1.2rem,2.7vw,1.8rem);margin:0 0 8px}
+  p.lead{color:var(--muted);margin:.25rem 0 1rem}
+  .grid{display:grid;gap:16px;grid-template-columns:1.2fr .8fr}
+  @media (max-width:980px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.35);padding:16px}
+  .card h2{font-size:1.05rem;margin:.2rem 0 .6rem}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  label{color:var(--muted)}
+  input[type=number], input[type=text], textarea{background:#0f1530;border:1px solid #2b3565;border-radius:10px;color:#eaf1ff;padding:8px 10px}
+  input[type=number]{width:120px}
+  input[type=text]{width:160px}
+  textarea{width:100%; min-height:84px; resize:vertical}
+  button{appearance:none;border:none;border-radius:10px;padding:10px 14px;background:#21305a;color:#e8efff;font-weight:700;cursor:pointer}
+  button.primary{background:linear-gradient(180deg,#6ea8fe,#3f67e6)}
+  button.warn{background:linear-gradient(180deg,#ffd166,#f4a261); color:#1c1c1c}
+  .pill{background:#1a2550;border:1px solid #344473;color:#d8e4ff;border-radius:10px;padding:6px 10px;display:inline-block}
+  .box{background:#111738;border:1px solid #313b66;border-radius:12px;padding:12px}
+  .mini{font-size:.95rem;color:#cdd7ff}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}
+  .kpi .pill{display:flex;justify-content:center}
+  .hr{height:1px;background:linear-gradient(90deg,transparent,#33406a,transparent);margin:12px 0}
+  /* 10x10 grid */
+  .grid100{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;width:300px}
+  .square{width:100%;aspect-ratio:1/1;background:#0f1530;border:1px solid #313b66}
+  .square.shaded{background:#3f66ff}
+  /* Worksheet styles */
+  .worksheet{background:#0e1434;border:1px solid #2f3a6b;border-radius:12px}
+  .worksheet h2{margin-top:0}
+  .q{margin:10px 0;padding:10px;border:1px solid #2b3565;border-radius:10px;background:#0f1436}
+  .q table{width:100%; border-collapse:collapse}
+  .q th,.q td{border:1px solid #2b3565; padding:6px}
+  .note{color:#9ed6be; font-size:.9rem}
+  .save-status{margin-left:8px; font-size:.9rem; color:#9ee0c9}
+  @media print{
+    body{background:#fff;color:#000}
+    .card, .wrap{box-shadow:none;background:#fff;color:#000}
+    .no-print{display:none !important}
+    .grid100 .square{border-color:#aaa}
+    .worksheet, .q{background:#fff;border-color:#bbb}
+    input, textarea{border:1px solid #444; color:#000}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Equivalence Explorer</h1>
+  <p class="lead">See how one value can be written as a <strong>percent</strong>, a <strong>fraction</strong>, or a <strong>decimal</strong>Ñdifferent looks, same value.</p>
+
+  <div class="grid">
+    <!-- INTERACTIVE CONVERTER -->
+    <section class="card" aria-labelledby="conv-title">
+      <h2 id="conv-title">1) Converter</h2>
+      <p class="mini">Type in <em>any one</em> box and the others update automatically.</p>
+      <div class="row">
+        <label>Percent (%)</label>
+        <input type="number" id="p_in" step="0.01" placeholder="e.g., 37.5" />
+        <label>Fraction</label>
+        <input type="text" id="f_in" placeholder="e.g., 3/8" />
+        <label>Decimal</label>
+        <input type="number" id="d_in" step="0.0001" placeholder="e.g., 0.375" />
+        <button class="primary no-print" id="clear">Clear</button>
+      </div>
+      <div class="kpi">
+        <span class="pill">Percent: <span id="k_pct">Ñ</span>%</span>
+        <span class="pill">Fraction: <span id="k_frac">Ñ</span></span>
+        <span class="pill">Decimal: <span id="k_dec">Ñ</span></span>
+      </div>
+      <div class="hr"></div>
+      <div class="two">
+        <div class="box">
+          <strong>10&times;10 Grid (Percent Area Model)</strong>
+          <div id="grid100" class="grid100" aria-label="hundreds grid"></div>
+          <p class="mini">Shaded squares show the percent out of 100.</p>
+        </div>
+        <div class="box">
+          <strong>Number Line (0 to 1)</strong>
+          <div id="line" style="height:120px"></div>
+          <p class="mini">The point shows the value as a fraction of 1 whole.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- MINI LESSON: HOW TO CONVERT -->
+    <aside class="card">
+      <h2>2) Mini?Lesson</h2>
+      <div class="box">
+        <strong>Fraction &rarr; Decimal</strong>
+        <p class="mini">Divide numerator by denominator. Example: 3/8 = 3 &divide; 8 = 0.375</p>
+      </div>
+      <div class="box">
+        <strong>Decimal &rarr; Percent</strong>
+        <p class="mini">Multiply by 100 and add %. Example: 0.375 &rarr; 37.5%</p>
+      </div>
+      <div class="box">
+        <strong>Percent &rarr; Fraction</strong>
+        <p class="mini">Write over 100 and simplify. Example: 37.5% = 37.5/100 = 3/8</p>
+      </div>
+      <div class="box">
+        <strong>Tip</strong>
+        <p class="mini">All three are the <em>same value</em>. Choose the form that fits the problem.</p>
+      </div>
+    </aside>
+  </div>
+
+  <div class="hr"></div>
+
+  <!-- WORKABLE WORKSHEET (fillable + autosave) -->
+  <section class="card worksheet" id="ws">
+    <h2>Worksheet: Percents, Fractions &amp; Decimals</h2>
+    <p class="mini">Students can type answers below. Work is saved in the browser on this device automatically. Use <strong>Export</strong> to download answers.</p>
+
+    <div class="q">
+      <strong>1) Match each set that shows the same value.</strong>
+      <p>(a) 0.6 - 60% - 3/5 &nbsp;&nbsp; (b) 0.04 - 4% - 1/25 &nbsp;&nbsp; (c) 0.125 - 12.5% - 1/8</p>
+      <textarea data-ws="q1" placeholder="Explain how you know the matches."></textarea>
+    </div>
+
+    <div class="q">
+      <strong>2) Fill the table.</strong>
+      <table>
+        <tr><th>Percent</th><th>Fraction</th><th>Decimal</th></tr>
+        <tr>
+          <td><input type="text" data-ws="q2a_pct" value="35%"></td>
+          <td><input type="text" data-ws="q2a_frac" placeholder="e.g., 7/20"></td>
+          <td><input type="text" data-ws="q2a_dec" placeholder="e.g., 0.35"></td>
+        </tr>
+        <tr>
+          <td><input type="text" data-ws="q2b_pct" placeholder="e.g., 35%"></td>
+          <td><input type="text" data-ws="q2b_frac" value="7/20"></td>
+          <td><input type="text" data-ws="q2b_dec" placeholder="e.g., 0.35"></td>
+        </tr>
+        <tr>
+          <td><input type="text" data-ws="q2c_pct" placeholder="e.g., 8%"></td>
+          <td><input type="text" data-ws="q2c_frac" placeholder="e.g., 2/25"></td>
+          <td><input type="text" data-ws="q2c_dec" value="0.08"></td>
+        </tr>
+        <tr>
+          <td><input type="text" data-ws="q2d_pct" value="125%"></td>
+          <td><input type="text" data-ws="q2d_frac" placeholder="e.g., 5/4"></td>
+          <td><input type="text" data-ws="q2d_dec" placeholder="e.g., 1.25"></td>
+        </tr>
+      </table>
+      <p class="note">Hint: If denominator &le; 20, try simplifying the fraction.</p>
+    </div>
+
+    <div class="q">
+      <strong>3) Use a 10&times;10 grid idea. Shade the percent and write the fraction and decimal.</strong>
+      <p>(a) 72% &nbsp;&nbsp; (b) 37% &nbsp;&nbsp; (c) 5%</p>
+      <textarea data-ws="q3" placeholder="Describe how many squares would be shaded and the matching fraction/decimal."></textarea>
+    </div>
+
+    <div class="q">
+      <strong>4) Word problems.</strong>
+      <ol style="margin:6px 0 0 18px">
+        <li>28% of the school&rsquo;s 500 students ride the bus. How many is that? Write your answer as a fraction of the school and as a decimal of 1.</li>
+        <li>Which is larger: 0.48 or 47%? Explain using the number line idea.</li>
+      </ol>
+      <textarea data-ws="q4" placeholder="Show your reasoning and calculations."></textarea>
+    </div>
+
+    <div class="q">
+      <strong>5) Create your own!</strong>
+      <p>Choose any fraction with denominator &le; 20. Convert it to a decimal and a percent. Show at least one simplification step.</p>
+      <div class="row" style="margin-top:6px">
+        <label>Fraction</label><input type="text" data-ws="q5_frac" placeholder="e.g., 7/8">
+        <label>Decimal</label><input type="text" data-ws="q5_dec" placeholder="e.g., 0.875">
+        <label>Percent</label><input type="text" data-ws="q5_pct" placeholder="e.g., 87.5%">
+      </div>
+      <textarea data-ws="q5_work" placeholder="Show your steps to simplify and convert."></textarea>
+    </div>
+
+    <div class="row no-print" style="gap:8px">
+      <button class="primary" id="ws_export">Export Answers (.json)</button>
+      <button id="ws_import" class="warn">Import Answers (.json)</button>
+      <input type="file" id="ws_file" accept="application/json" style="display:none">
+      <button id="ws_clear">Clear All</button>
+      <button class="primary" onclick="window.print()">Print / Save as PDF</button>
+      <span id="ws_status" class="save-status">Autosaved</span>
+    </div>
+  </section>
+</div>
+
+<script>
+// ===== Helpers =====
+const el = id => document.getElementById(id);
+const clamp = (x,min,max)=> Math.min(max,Math.max(min,x));
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a}
+function simplifyFrac(n,d){ if(d===0) return {n:NaN,d:NaN}; const g=gcd(n,d); return {n:n/g,d:d/g} }
+function toFracFromDecimal(x){
+  const s=String(x);
+  if(!s.includes('.')) return simplifyFrac(+x,1);
+  const k=s.split('.')[1].length;
+  const den=Math.pow(10,k);
+  const num=Math.round(+x*den);
+  return simplifyFrac(num,den);
+}
+
+// ===== Converter UI =====
+function renderAllFromPercent(p){
+  if(isNaN(p)) return;
+  const pct = clamp(p, -100000, 100000);
+  el('k_pct').textContent = (+pct).toFixed(2).replace(/\.00$/,'');
+  const dec = pct/100; el('k_dec').textContent = dec.toString();
+  const fr = toFracFromDecimal(dec); el('k_frac').textContent = `${fr.n}/${fr.d}`;
+  el('p_in').value = pct; el('d_in').value = dec; el('f_in').value = `${fr.n}/${fr.d}`;
+  drawHundredsGrid(Math.round(pct)); drawNumberLine(dec);
+}
+function renderAllFromDecimal(d){ if(isNaN(d)) return; renderAllFromPercent(d*100) }
+function renderAllFromFraction(s){
+  const m = String(s).trim().match(/^\s*(-?\d+)\s*\/\s*(\d+)\s*$/);
+  if(!m){ return; }
+  const n=+m[1], d=+m[2]; if(d===0) return;
+  const simp=simplifyFrac(n,d); const dec=simp.n/simp.d; renderAllFromDecimal(dec);
+}
+
+// Hundreds grid
+function drawHundredsGrid(pct){
+  const g = el('grid100'); g.innerHTML='';
+  const total = clamp(Math.round(pct), -1000, 1000);
+  const cells = 100;
+  for(let i=0;i<cells;i++){
+    const sq=document.createElement('div');
+    sq.className='square'+(i<Math.max(0,Math.min(100,total))?' shaded':'');
+    g.appendChild(sq);
+  }
+}
+
+// Number line 0..1 (extend if >1 or negative)
+function drawNumberLine(val){
+  const cont = el('line'); const w=900, h=110, m=40; let svg='';
+  const min = Math.min(0, Math.floor(val));
+  const max = Math.max(1, Math.ceil(val));
+  const range = max-min; const xOf=v=> m + ((v-min)/range)*(w-2*m);
+  svg += `<line x1="${m}" y1="60" x2="${w-m}" y2="60" stroke="#4e5d93" stroke-width="3"/>`;
+  for(let t=min; t<=max; t+=0.1){ const x=xOf(t); if(Math.abs((t*10)%1)<1e-9){ svg+=`<line x1="${x}" y1="54" x2="${x}" y2="66" stroke="#aab4d6"/>`; } }
+  for(let t=min; t<=max; t+=1){ const x=xOf(t); svg += `<text x="${x-5}" y="80" fill="#aab4d6" font-size="12">${t}</text>`; }
+  const xp = xOf(val);
+  svg += `<circle cx="${xp}" cy="60" r="6" fill="#6ea8fe"/>`;
+  svg += `<text x="${xp+8}" y="55" fill="#d8e4ff">value</text>`;
+  cont.innerHTML = `<svg viewBox="0 0 ${w} ${h}" width="100%">${svg}</svg>`;
+}
+
+// Events for converter
+el('p_in').addEventListener('input', e=> renderAllFromPercent(+e.target.value));
+el('d_in').addEventListener('input', e=> renderAllFromDecimal(+e.target.value));
+el('f_in').addEventListener('change', e=> renderAllFromFraction(e.target.value));
+el('clear').addEventListener('click', ()=>{
+  el('p_in').value=''; el('f_in').value=''; el('d_in').value='';
+  el('k_pct').textContent='Ñ'; el('k_frac').textContent='Ñ'; el('k_dec').textContent='Ñ';
+  el('grid100').innerHTML=''; el('line').innerHTML='';
+});
+renderAllFromPercent(37.5);
+
+// ===== Workable Worksheet: autosave, export/import =====
+const WS_KEY = 'equivalence_ws_v1';
+function wsLoad(){
+  try{ const raw = localStorage.getItem(WS_KEY); if(!raw) return; const data = JSON.parse(raw);
+    document.querySelectorAll('[data-ws]').forEach(node=>{ const k=node.getAttribute('data-ws'); if(data[k]!=null){ node.value = data[k]; }});
+    setStatus('Loaded saved work');
+  }catch(e){ setStatus('Could not load saved work'); }
+}
+function wsSave(){
+  const data={}; document.querySelectorAll('[data-ws]').forEach(node=>{ data[node.getAttribute('data-ws')] = node.value; });
+  try{ localStorage.setItem(WS_KEY, JSON.stringify(data)); setStatus('Autosaved'); }catch(e){ setStatus('Save failed'); }
+}
+function wsClear(){
+  document.querySelectorAll('[data-ws]').forEach(n=> n.value='');
+  localStorage.removeItem(WS_KEY); setStatus('Cleared');
+}
+function wsExport(){
+  const data={}; document.querySelectorAll('[data-ws]').forEach(node=>{ data[node.getAttribute('data-ws')] = node.value; });
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='equivalence-worksheet-answers.json'; a.click(); URL.revokeObjectURL(url);
+}
+function wsImport(file){
+  const reader = new FileReader(); reader.onload = e=>{
+    try{ const data = JSON.parse(e.target.result);
+      document.querySelectorAll('[data-ws]').forEach(node=>{ const k=node.getAttribute('data-ws'); if(data[k]!=null){ node.value = data[k]; }});
+      wsSave(); setStatus('Imported answers');
+    }catch(err){ setStatus('Import failed'); }
+  }; reader.readAsText(file);
+}
+function setStatus(msg){ const s=el('ws_status'); if(!s) return; s.textContent = msg; }
+
+// Hook up worksheet events
+window.addEventListener('load', ()=>{
+  wsLoad();
+  document.querySelectorAll('[data-ws]').forEach(n=> n.addEventListener('input', wsSave));
+  el('ws_export').addEventListener('click', wsExport);
+  el('ws_clear').addEventListener('click', wsClear);
+  el('ws_import').addEventListener('click', ()=> el('ws_file').click());
+  el('ws_file').addEventListener('change', (e)=>{ const f=e.target.files[0]; if(f) wsImport(f); });
+});
+</script>
+</body>
+</html>

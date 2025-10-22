@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Interactive Applet: Solving Linear Equations Ñ Light Theme + Study Guide + Export</title>
+<style>
+  body{background:#f5f7fb;color:#202530;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;margin:0}
+  .wrap{max-width:1100px;margin:24px auto 64px;padding:0 16px}
+  .card{background:#ffffff;border:1px solid #ccd3e0;border-radius:16px;box-shadow:0 2px 5px rgba(0,0,0,0.1);padding:18px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .select,.text,.btn{border-radius:8px;border:1px solid #b6bed0;background:#f0f3f9;color:#202530;padding:10px 12px;font-size:14px}
+  .btn{cursor:pointer;background:#2a6ee8;color:white;border:none;transition:0.3s}
+  .btn:hover{background:#1d55b3}
+  .btn.secondary{background:#ffffff;color:#1d55b3;border:1px solid #b6bed0}
+  .btn.secondary:hover{background:#eef4ff}
+  .equation{font-size:28px;text-align:center;margin:12px 0;color:#1a2033}
+  .mini{font-size:13px;color:#555d6d}
+  .status{margin-top:8px;color:#4b5363;font-weight:500}
+  .section-title{margin:18px 0 8px;font-size:14px;color:#4b5363;font-weight:600}
+  details>summary{cursor:pointer;user-select:none;font-weight:600}
+  details>summary::-webkit-details-marker{display:none}
+  .spacer{flex:1}
+
+  /* Print styling for PDF export */
+  @media print{
+    body{background:white}
+    .no-print{display:none!important}
+    .card{box-shadow:none;border-color:#bbb}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Interactive Applet - Solving Linear Equations</h1>
+  <p class="mini">Difficulty controls the equation type. You can move variable terms using inputs like <code>7x</code>, <code>-x</code>, or even fractions like <code>1/2x</code>.</p>
+
+  <div class="row no-print" style="margin:10px 0 16px">
+    <label for="difficulty" class="mini">Difficulty</label>
+    <select id="difficulty" class="select">
+      <option value="one">One-step (ax + b = c)</option>
+      <option value="two" selected>Two-step (ax + b = c)</option>
+      <option value="bothSides">Both sides (ax + b = cx + d)</option>
+      <option value="fractions">Fractions (true fractions)</option>
+      <option value="decimals">Decimals</option>
+    </select>
+    <button id="btnNew" class="btn">New Equation</button>
+
+    <div class="spacer"></div>
+    <span class="mini">Save & Export:</span>
+    <button id="btnSaveJSON" class="btn secondary" title="Download a JSON file of your current work">Download JSON</button>
+    <button id="btnExportTXT" class="btn secondary" title="Download a readable text report">Download TXT</button>
+    <button id="btnExportPDF" class="btn secondary" title="Create a PDF via print dialog">Export to PDF</button>
+    <button id="btnSaveLocal" class="btn secondary" title="Save to this browser (localStorage)">Save to Browser</button>
+    <button id="btnLoadLocal" class="btn secondary" title="Load last saved session from this browser">Load from Browser</button>
+    <label for="importJSON" class="btn secondary" title="Import a previously saved JSON">Import JSON</label>
+    <input id="importJSON" type="file" accept="application/json" />
+  </div>
+
+  <div id="workArea" class="card">
+    <div id="equation" class="equation"></div>
+    <div id="status" class="status"></div>
+
+    <div class="row" style="margin-top:10px">
+      <select id="op" class="select">
+        <option value="add">Add</option>
+        <option value="sub">Subtract</option>
+        <option value="mul">Multiply</option>
+        <option value="div">Divide</option>
+      </select>
+      <input id="opVal" class="text" placeholder="value (e.g., 3 or 7x)" />
+      <button id="btnApply" class="btn">Apply to both sides</button>
+      <button id="btnReset" class="btn secondary">Reset</button>
+    </div>
+
+    <div class="row" style="margin-top:12px">
+      <input id="guess" class="text" placeholder="Try a solution for x (number)" />
+      <button id="btnCheck" class="btn secondary">Check by substitution</button>
+      <button id="btnSolve" class="btn">Reveal solution</button>
+    </div>
+    <div id="checkMsg" class="status"></div>
+
+    <div class="section-title">Tips</div>
+    <div class="mini">Move constants with numbers; move variable terms with kx (e.g., -3x). Clear fractions/decimals first. In Fractions mode, you can type inputs like <code>3/4</code> or <code>-1/2x</code>.</div>
+
+    <h3 class="section-title">Progress</h3>
+    <ol id="history" class="mini"></ol>
+  </div>
+
+  <details class="card" style="margin-top:16px">
+    <summary>Study Guide: How to Solve Linear Equations</summary>
+    <div class="mini" style="margin-top:8px;line-height:1.6">
+      <h4>Core Goal</h4>
+      Isolate <strong>x</strong> while keeping the equation balanced (do the same operation to both sides).
+      <h4>Legal Moves (Properties of Equality)</h4>
+      <ul>
+        <li>Add/Subtract the same number or term (e.g., <code>7x</code>) on both sides.</li>
+        <li>Multiply/Divide both sides by the same <em>nonzero</em> number.</li>
+      </ul>
+      <h4>Strategy</h4>
+      <ol>
+        <li><strong>Simplify</strong> each side (distribute, combine like terms).</li>
+        <li><strong>Collect</strong> variable terms on one side and constants on the other.</li>
+        <li><strong>Scale</strong> to make the coefficient of <code>x</code> equal 1 (Multiply/Divide).</li>
+        <li><strong>Check</strong> by substitution.</li>
+      </ol>
+      <h4>Special Cases</h4>
+      <ul>
+        <li><em>Identity</em> (e.g., <code>6 = 6</code>): infinitely many solutions (all real numbers).</li>
+        <li><em>Contradiction</em> (e.g., <code>3 = 8</code>): no solution.</li>
+      </ul>
+      <h4>Fractions & Decimals</h4>
+      <ul>
+        <li><strong>Fractions:</strong> Multiply both sides by the LCM to clear denominators.</li>
+        <li><strong>Decimals:</strong> Multiply both sides by 10, 100, 1000, to shift place values.</li>
+      </ul>
+      <h4>Quick Example (Fractions)</h4>
+      Solve <code>(1/2)x + 3/4 = 5, </code>  Multiply both sides by 4,  <code>2x + 3 = 20</code>  Subtract 3,  <code>2x = 17</code>  Divide by 2,  <code>x = 17/2</code>.
+    </div>
+  </details>
+</div>
+
+<script>
+(function(){
+  // -------- Core algebra machinery --------
+  function Expr(a,b){this.a=a;this.b=b}
+  function cloneEq(eq){return {L:new Expr(eq.L.a,eq.L.b),R:new Expr(eq.R.a,eq.R.b)}}
+  function tidy(n){if(Math.abs(n)<1e-12)return 0;return Number(n.toFixed(12))}
+  function simplify(e){e.a=tidy(e.a);e.b=tidy(e.b);return e}
+
+  // ----- Fraction display helpers (for Fractions mode) -----
+  var FRACTION_DENOMS = [2,3,4,5,6,8,10,12];
+  function nearestFraction(n){
+    var sign = n<0?-1:1; n = Math.abs(n);
+    var r = Math.round(n); if(Math.abs(n-r)<1e-10) return {num:sign*r, den:1};
+    var best = null, bestErr = 1e9;
+    for(var i=0;i<FRACTION_DENOMS.length;i++){
+      var den = FRACTION_DENOMS[i];
+      var num = Math.round(n*den);
+      var val = num/den;
+      var err = Math.abs(val - n);
+      if(err < bestErr + 1e-12){ bestErr = err; best = {num:sign*num, den:den}; }
+    }
+    return best || {num:sign*r, den:1};
+  }
+  function asFractionString(n){
+    var f = nearestFraction(n);
+    if(f.den===1) return String(f.num);
+    var s = (f.num<0?"-":"");
+    var anum = Math.abs(f.num);
+    return s + anum + "/" + f.den;
+  }
+  var currentMode = 'two';
+  function displayNumber(n){
+    if(currentMode==='fractions') return asFractionString(n);
+    var r=Math.round(n); return Math.abs(n-r)<1e-10?String(r):String(n);
+  }
+
+  function exprPretty(e){
+    var s='';
+    if(e.a!==0){ if(e.a===1) s+='x'; else if(e.a===-1) s+='-x'; else s+=displayNumber(e.a)+'x'; }
+    if(e.b!==0){ if(s) s+=(e.b>0?' + ':' - ')+displayNumber(Math.abs(e.b)); else s+=displayNumber(e.b); }
+    return s||'0'
+  }
+  function eqToString(eq){return exprPretty(eq.L)+' = '+exprPretty(eq.R)}
+  function solve(eq){
+    var A=tidy(eq.L.a-eq.R.a); var B=tidy(eq.R.b-eq.L.b);
+    if(A===0){ if(B===0) return {kind:'identity'}; return {kind:'none'}; }
+    return {kind:'one', x: tidy(B/A)};
+  }
+  function isIdentity(eq){return eq.L.a===eq.R.a && eq.L.b===eq.R.b}
+  function isContradiction(eq){return eq.L.a===eq.R.a && eq.L.b!==eq.R.b}
+
+  function ri(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+  function sg(){return Math.random()<0.5?-1:1}
+
+  function makeOneTwo(){var a=sg()*ri(1,9); var xStar=sg()*ri(1,9); var b=sg()*ri(0,12); var c=a*xStar+b; return {L:new Expr(a,b),R:new Expr(0,c)}}
+  function genOne(){return makeOneTwo()}
+  function genTwo(){return makeOneTwo()}
+  function genBothSides(){var xStar=sg()*ri(1,9); var a=sg()*ri(1,8); var c=a; while(c===a){ c=a+sg()*ri(1,6); } var b=sg()*ri(-10,10); var d=a*xStar + b - c*xStar; return {L:new Expr(a,b),R:new Expr(c,d)}}
+  function genFractions(){ var base=makeOneTwo(); var den=[2,3,4,6,12][ri(0,4)]; base.L.a/=den;base.L.b/=den;base.R.a/=den;base.R.b/=den; simplify(base.L);simplify(base.R); return base }
+  function genDecimals(){ var base=makeOneTwo(); var k=[0.1,0.01][ri(0,1)]; base.L.a*=k;base.L.b*=k;base.R.a*=k;base.R.b*=k; simplify(base.L);simplify(base.R); return base }
+  function genByMode(m){ if(m==='one')return genOne(); if(m==='two')return genTwo(); if(m==='bothSides')return genBothSides(); if(m==='fractions')return genFractions(); if(m==='decimals')return genDecimals(); return genTwo() }
+
+  // -------- Input parsing (supports integers, decimals, and fractions like 3/4 or -1/2x) --------
+  function parseFraction(str){
+    if(!/^[+-]?\d+(?:\/\d+)?$/.test(str)) return null;
+    if(str.indexOf('/')===-1) return Number(str);
+    var parts = str.split('/');
+    var num = Number(parts[0]); var den = Number(parts[1]);
+    if(!isFinite(num) || !isFinite(den) || den===0) return null;
+    return num/den;
+  }
+  function parseOperand(raw){
+    if(!raw) return null;
+    var s=String(raw).replace(/\s+/g,'').toLowerCase();
+    if(s.endsWith('x')){
+      var coefStr=s.slice(0,-1);
+      if(coefStr===''||coefStr==='+') return {type:'var', coef:1};
+      if(coefStr==='-') return {type:'var', coef:-1};
+      var f=parseFraction(coefStr);
+      if(f===null){ var v=Number(coefStr); if(!isFinite(v)) return null; return {type:'var', coef: tidy(v)}; }
+      return {type:'var', coef: tidy(f)};
+    } else {
+      var f2=parseFraction(s);
+      if(f2===null){ var w=Number(s); if(!isFinite(w)) return null; return {type:'const', value: tidy(w)}; }
+      return {type:'const', value: tidy(f2)};
+    }
+  }
+
+  // ------- State & rendering -------
+  var eq=null, original=null, steps=[];
+  var eqEl=document.getElementById('equation');
+  var statusEl=document.getElementById('status');
+  var historyEl=document.getElementById('history');
+  var guessEl=document.getElementById('guess');
+  var checkMsg=document.getElementById('checkMsg');
+  var difficulty=document.getElementById('difficulty');
+  var opValEl=document.getElementById('opVal');
+
+  function setFrom(newEq){ original=cloneEq(newEq); eq=cloneEq(newEq); steps=[]; render(); }
+  function render(){ eqEl.textContent=eqToString(eq); if(isIdentity(eq)) statusEl.textContent='Identity: all real numbers'; else if(isContradiction(eq)) statusEl.textContent='No solution (contradiction)'; else statusEl.textContent='Apply an operation to both sides, then simplify.'; historyEl.innerHTML=steps.map(function(s,i){return '<li>Step '+(i+1)+': '+s+'</li>'}).join('') }
+
+  function newEquation(){ var mode=difficulty.value; currentMode = mode; if(mode==='fractions') opValEl.placeholder='value (e.g., 3/4 or -1/2x)'; else opValEl.placeholder='value (e.g., 3 or 7x)'; setFrom(genByMode(mode)) }
+
+  function applyOp(kind, operand){
+    if(!operand) return;
+    if((kind==='mul'||kind==='div') && operand.type==='var'){
+      statusEl.textContent='Multiply/Divide must use a number, not kx.'; return;
+    }
+    if(kind==='add'){
+      if(operand.type==='const'){
+        eq.L.b=tidy(eq.L.b+operand.value); eq.R.b=tidy(eq.R.b+operand.value);
+        steps.push('Add '+(currentMode==='fractions'?asFractionString(operand.value):operand.value)+' to both sides');
+      } else {
+        eq.L.a=tidy(eq.L.a+operand.coef); eq.R.a=tidy(eq.R.a+operand.coef);
+        steps.push('Add '+(currentMode==='fractions'?asFractionString(operand.coef):operand.coef)+'x to both sides');
+      }
+    } else if(kind==='sub'){
+      if(operand.type==='const'){
+        eq.L.b=tidy(eq.L.b-operand.value); eq.R.b=tidy(eq.R.b-operand.value);
+        steps.push('Subtract '+(currentMode==='fractions'?asFractionString(operand.value):operand.value)+' from both sides');
+      } else {
+        eq.L.a=tidy(eq.L.a-operand.coef); eq.R.a=tidy(eq.R.a-operand.coef);
+        steps.push('Subtract '+(currentMode==='fractions'?asFractionString(operand.coef):operand.coef)+'x from both sides');
+      }
+    } else if(kind==='mul'){
+      var v=operand.value; eq.L.a=tidy(eq.L.a*v); eq.L.b=tidy(eq.L.b*v); eq.R.a=tidy(eq.R.a*v); eq.R.b=tidy(eq.R.b*v);
+      steps.push('Multiply both sides by '+(currentMode==='fractions'?asFractionString(v):v));
+    } else if(kind==='div'){
+      var v2=operand.value; if(v2===0){ statusEl.textContent='Cannot divide by 0.'; return; }
+      eq.L.a=tidy(eq.L.a/v2); eq.L.b=tidy(eq.L.b/v2); eq.R.a=tidy(eq.R.a/v2); eq.R.b=tidy(eq.R.b/v2);
+      steps.push('Divide both sides by '+(currentMode==='fractions'?asFractionString(v2):v2));
+    }
+    simplify(eq.L); simplify(eq.R);
+    render();
+    var S=solve(eq); if(S.kind==='one') statusEl.textContent='x = '+displayNumber(S.x);
+  }
+
+  // ---- Save / Export helpers ----
+  function snapshot(){
+    var sol = solve(eq);
+    return {
+      timestamp: new Date().toISOString(),
+      difficulty: difficulty.value,
+      equationInitial: eqToString(original),
+      equationCurrent: eqToString(eq),
+      originalCoefficients: {L:{a:original.L.a,b:original.L.b}, R:{a:original.R.a,b:original.R.b}},
+      currentCoefficients: {L:{a:eq.L.a,b:eq.L.b}, R:{a:eq.R.a,b:eq.R.b}},
+      steps: steps.slice(),
+      status: statusEl.textContent,
+      solution: sol
+    };
+  }
+  function downloadFile(filename, content, mime){
+    var blob = new Blob([content], {type: mime});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+  function toTxtReport(data){
+    var lines = [];
+    lines.push('Solving Linear Equations Ñ Work Report');
+    lines.push('Date: '+ new Date(data.timestamp).toLocaleString());
+    lines.push('Difficulty: '+ data.difficulty);
+    lines.push('Initial: '+ data.equationInitial);
+    lines.push('Current: '+ data.equationCurrent);
+    lines.push('');
+    lines.push('Steps:');
+    if(data.steps.length===0) lines.push('  (no steps yet)');
+    else data.steps.forEach(function(s,i){ lines.push('  '+(i+1)+'. '+s); });
+    lines.push('');
+    if(data.solution && data.solution.kind==='one') lines.push('Solution: x = '+ displayNumber(data.solution.x));
+    else if(data.solution && data.solution.kind==='identity') lines.push('Solution: Identity (all real numbers)');
+    else if(data.solution && data.solution.kind==='none') lines.push('Solution: No solution (contradiction)');
+    lines.push('Status: '+ data.status);
+    return lines.join('\n');
+  }
+  function openPrintReport(){
+    var data = snapshot();
+    var solutionText = '';
+    if(data.solution && data.solution.kind === 'one'){
+      solutionText = 'x = ' + (data.difficulty === 'fractions' ? displayNumber(data.solution.x) : String(data.solution.x));
+    } else if(data.solution && data.solution.kind === 'identity'){
+      solutionText = 'Identity (all real numbers)';
+    } else if(data.solution && data.solution.kind === 'none'){
+      solutionText = 'No solution';
+    }
+    var stepsHtml = (data.steps && data.steps.length)
+      ? data.steps.map(function(s){ return '<li>' + s + '</li>'; }).join('')
+      : '<li>(no steps yet)</li>';
+    var html = ''+
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Equation Work Report</title>'+
+      '<style>body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;margin:24px;color:#222}'+
+      'h1{font-size:20px;margin:0 0 6px} .muted{color:#555} .sec{margin-top:16px} ol{padding-left:20px}'+
+      'code{background:#f2f4f8;padding:2px 5px;border-radius:4px}</style></head><body>'+
+      '<h1>Solving Linear Equations Ñ Work Report</h1>'+
+      '<div class="muted">Date: ' + new Date(data.timestamp).toLocaleString() + '</div>'+
+      '<div class="muted">Difficulty: ' + data.difficulty + '</div>'+
+      '<div class="sec"><strong>Initial:</strong> <code>' + data.equationInitial + '</code></div>'+
+      '<div><strong>Current:</strong> <code>' + data.equationCurrent + '</code></div>'+
+      '<div class="sec"><strong>Steps</strong></div>'+
+      '<ol>' + stepsHtml + '</ol>'+
+      '<div class="sec"><strong>Solution:</strong> ' + solutionText + '</div>'+
+      '<script>window.onload = function(){ setTimeout(function(){ window.print(); }, 300); }<\/script>'+
+      '</body></html>';
+    var w = window.open('about:blank','_blank');
+    w.document.open(); w.document.write(html); w.document.close();
+  }
+
+  // Buttons
+  document.getElementById('btnSaveJSON').addEventListener('click', function(){
+    var data = snapshot();
+    downloadFile('equation_work.json', JSON.stringify(data, null, 2), 'application/json');
+  });
+  document.getElementById('btnExportTXT').addEventListener('click', function(){
+    var data = snapshot();
+    downloadFile('equation_work.txt', toTxtReport(data), 'text/plain');
+  });
+  document.getElementById('btnExportPDF').addEventListener('click', function(){
+    openPrintReport(); // Use browser's Save as PDF
+  });
+  document.getElementById('btnSaveLocal').addEventListener('click', function(){
+    try { localStorage.setItem('equation_session', JSON.stringify(snapshot())); statusEl.textContent = 'Saved to this browser.'; }
+    catch(e){ statusEl.textContent = 'Save failed: '+ e; }
+  });
+  document.getElementById('btnLoadLocal').addEventListener('click', function(){
+    try { var raw = localStorage.getItem('equation_session'); if(!raw){ statusEl.textContent='No saved session found.'; return; }
+      var data = JSON.parse(raw); restoreFromSnapshot(data); statusEl.textContent='Loaded last saved session.'; }
+    catch(e){ statusEl.textContent = 'Load failed: '+ e; }
+  });
+  document.getElementById('importJSON').addEventListener('change', function(ev){
+    var file = ev.target.files[0]; if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      try { var data = JSON.parse(reader.result); restoreFromSnapshot(data); statusEl.textContent='Imported JSON session.'; }
+      catch(e){ statusEl.textContent='Import failed: '+ e; }
+    };
+    reader.readAsText(file);
+    ev.target.value = '';
+  });
+
+  function restoreFromSnapshot(data){
+    if(data.originalCoefficients && data.currentCoefficients){
+      original = { L: new Expr(data.originalCoefficients.L.a, data.originalCoefficients.L.b),
+                   R: new Expr(data.originalCoefficients.R.a, data.originalCoefficients.R.b) };
+      eq = { L: new Expr(data.currentCoefficients.L.a, data.currentCoefficients.L.b),
+             R: new Expr(data.currentCoefficients.R.a, data.currentCoefficients.R.b) };
+    }
+    steps = Array.isArray(data.steps) ? data.steps.slice() : [];
+    difficulty.value = data.difficulty || difficulty.value;
+    render();
+    var s = data.solution; if(s){
+      if(s.kind==='one') document.getElementById('checkMsg').textContent = 'Solution: x = '+ displayNumber(s.x);
+      else if(s.kind==='identity') document.getElementById('checkMsg').textContent = 'Identity: all real numbers';
+      else if(s.kind==='none') document.getElementById('checkMsg').textContent = 'No solution';
+    }
+  }
+
+  // Core controls
+  document.getElementById('btnApply').addEventListener('click',function(){ var kind=document.getElementById('op').value; var raw=opValEl.value; var operand=parseOperand(raw); if(!operand){ statusEl.textContent='Enter a number (e.g., 3 or 3/4) or a variable term (e.g., 7x, -1/2x).'; return; } applyOp(kind,operand); });
+  document.getElementById('btnReset').addEventListener('click',function(){ eq=cloneEq(original); steps=[]; render(); });
+  document.getElementById('btnSolve').addEventListener('click',function(){ var S=solve(eq); if(S.kind==='one'){ checkMsg.textContent='Solution: x = '+displayNumber(S.x); } else if(S.kind==='identity'){ checkMsg.textContent='Identity: all real numbers'; } else { checkMsg.textContent='No solution'; } });
+  document.getElementById('btnCheck').addEventListener('click',function(){ var v=Number(guessEl.value); if(!isFinite(v)){ checkMsg.textContent='Enter a number to check.'; return; } var L=tidy(eq.L.a*v+eq.L.b); var R=tidy(eq.R.a*v+eq.R.b); if(Math.abs(L-R)<1e-9){ checkMsg.textContent='Works! LHS = RHS = '+displayNumber(L); } else { checkMsg.textContent='Not equal: LHS='+displayNumber(L)+', RHS='+displayNumber(R); } });
+  document.getElementById('btnNew').addEventListener('click',newEquation);
+  difficulty.addEventListener('change',newEquation);
+
+  // init
+  newEquation();
+})();
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-# Retry writing the HTML applet to disk
+
 html = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -185,9 +185,9 @@ html = r"""<!DOCTYPE html>
         <h3>Snapshot</h3>
         <table>
           <tr><th>Total responses</th><td id="stat_count">0</td></tr>
-          <tr><th>Median Volume</th><td id="stat_volume">–</td></tr>
-          <tr><th>Median Light</th><td id="stat_light">–</td></tr>
-          <tr><th>Median Social</th><td id="stat_social">–</td></tr>
+          <tr><th>Median Volume</th><td id="stat_volume">√ê</td></tr>
+          <tr><th>Median Light</th><td id="stat_light">√ê</td></tr>
+          <tr><th>Median Social</th><td id="stat_social">√ê</td></tr>
         </table>
       </div>
       <div class="card">
@@ -216,7 +216,7 @@ html = r"""<!DOCTYPE html>
       <table id="table_recent">
         <thead>
           <tr>
-            <th>When</th><th>Name</th><th>Class</th><th>Desires (topics)</th><th>Needs (challenge)</th><th>Stress when…</th>
+            <th>When</th><th>Name</th><th>Class</th><th>Desires (topics)</th><th>Needs (challenge)</th><th>Stress when√â</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -349,13 +349,13 @@ function renderDashboard(){
   const rows = loadResponses();
   // Snapshot numbers
   $("#stat_count").textContent = rows.length;
-  $("#stat_volume").textContent = rows.length? median(rows.map(r=>r.vol)).toFixed(1) : "–";
-  $("#stat_light").textContent = rows.length? median(rows.map(r=>r.light)).toFixed(1) : "–";
-  $("#stat_social").textContent = rows.length? median(rows.map(r=>r.social)).toFixed(1) : "–";
+  $("#stat_volume").textContent = rows.length? median(rows.map(r=>r.vol)).toFixed(1) : "√ê";
+  $("#stat_light").textContent = rows.length? median(rows.map(r=>r.light)).toFixed(1) : "√ê";
+  $("#stat_social").textContent = rows.length? median(rows.map(r=>r.social)).toFixed(1) : "√ê";
 
   // Top needs & stress keywords
   const top = keywordCounts(rows.map(r => (r.needs_challenge||"")+" "+(r.needs_stress_when||"")));
-  $("#top_keywords").innerHTML = top.length? top.map(([w,c])=>`<span class="pill">${w} · ${c}</span>`).join("") : "–";
+  $("#top_keywords").innerHTML = top.length? top.map(([w,c])=>`<span class="pill">${w} √° ${c}</span>`).join("") : "√ê";
 
   // Recent table
   const tbody = $("#table_recent tbody");
@@ -422,7 +422,7 @@ function drawHistogram(canvas, data, label){
   // labels
   ctx.fillStyle = "#0f172a";
   ctx.font = "28px system-ui";
-  ctx.fillText(label+" (0–100)", pad, pad-10);
+  ctx.fillText(label+" (0√ê100)", pad, pad-10);
 
   ctx.font = "24px system-ui";
   for(let i=0;i<=10;i++){
@@ -467,3 +467,4 @@ with open(path, "w", encoding="utf-8") as f:
     f.write(html)
 
 path
+

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Learning DNA Classroom Applet</title>
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --accent:#1e293b; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,Helvetica,Arial,sans-serif; color:var(--ink); background:var(--bg)}
+  header{display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:var(--card); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:10}
+  header h1{font-size:18px; margin:0}
+  .wrap{max-width:1000px; margin:20px auto; padding:0 16px}
+  .tabs{display:flex; gap:8px; flex-wrap:wrap}
+  .tab{padding:10px 14px; border:1px solid var(--line); border-radius:999px; background:#fff; cursor:pointer; color:var(--muted)}
+  .tab.active{background:var(--ink); color:#fff; border-color:var(--ink)}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; margin:16px 0}
+  .row{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  .row-3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+  label{font-weight:600; font-size:14px; display:block; margin-bottom:6px}
+  textarea, input[type="text"], select{width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:12px; font-size:14px; background:#fff}
+  textarea{min-height:80px; resize:vertical}
+  .hint{font-size:12px; color:var(--muted); margin-top:4px}
+  .slider-group{background:#f1f5f9; border-radius:12px; padding:10px 12px; border:1px solid var(--line)}
+  .slider-row{display:grid; grid-template-columns:140px 1fr 60px; gap:8px; align-items:center; margin:8px 0}
+  input[type="range"]{width:100%}
+  .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+  button{padding:10px 14px; border-radius:12px; border:1px solid var(--line); background:#111827; color:#fff; cursor:pointer; font-weight:600}
+  button.ghost{background:#fff; color:var(--ink)}
+  .muted{color:var(--muted)}
+  .pill{display:inline-block; padding:6px 10px; border-radius:999px; border:1px solid var(--line); background:#fff; margin:4px; font-size:12px}
+  table{width:100%; border-collapse:collapse; font-size:14px}
+  th, td{border-bottom:1px solid var(--line); padding:10px; text-align:left; vertical-align:top}
+  th{background:#f8fafc}
+  canvas{width:100%; height:240px; border:1px solid var(--line); border-radius:12px; background:#fff}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  @media (max-width:850px){
+    .row, .row-3, .grid{grid-template-columns:1fr}
+  }
+  .footer{font-size:12px; color:var(--muted); text-align:center; margin:24px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>Learning DNA  Classroom Applet</h1>
+  <div class="tabs">
+    <div class="tab active" data-tab="student">Student Form</div>
+    <div class="tab" data-tab="dashboard">Teacher Dashboard</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- Student Form -->
+  <section class="card" id="student">
+    <h2>Student Form</h2>
+    <p class="muted">Complete the inventory so your teacher understands your Desires, Needs, and Assets. Your responses are saved locally (offline) in this browser.</p>
+    <div class="row">
+      <div>
+        <label>Student Name (optional)</label>
+        <input type="text" id="name" placeholder="First name or initials"/>
+      </div>
+      <div>
+        <label>Class/Section (optional)</label>
+        <input type="text" id="clazz" placeholder="Eg. 7A, Algebra 1, etc."/>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>My Desires</h3>
+      <label>My future goals and aspirations are...</label>
+      <textarea id="desires_goals"></textarea>
+
+      <label>My favorite activities and hobbies are...</label>
+      <textarea id="desires_hobbies"></textarea>
+
+      <label>My favorite topics are...</label>
+      <textarea id="desires_topics"></textarea>
+
+      <label>My favorite space to learn is... because...</label>
+      <div class="row">
+        <input type="text" id="desires_space" placeholder="Space"/>
+        <input type="text" id="desires_because" placeholder="Because..."/>
+      </div>
+      <p class="hint">This section mirrors the My Desires prompts.</p>
+    </div>
+
+    <div class="card">
+      <h3>My Needs</h3>
+      <label>I would like to continue to grow in my understanding of or ability to...</label>
+      <textarea id="needs_grow"></textarea>
+
+      <label>One thing that challenges me is...</label>
+      <textarea id="needs_challenge"></textarea>
+
+      <label>I get stressed when...</label>
+      <textarea id="needs_stress_when"></textarea>
+
+      <div class="row">
+        <div>
+          <label>When I am stressed, I need to...</label>
+          <input type="text" id="needs_stress_need" />
+        </div>
+        <div>
+          <label>When I am studying, I like it to be some place...</label>
+          <input type="text" id="needs_study_place" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>My Assets</h3>
+      <div class="row">
+        <div>
+          <label>I am interested in learning...</label>
+          <input type="text" id="assets_learn"/>
+        </div>
+        <div>
+          <label>I am interested in doing...</label>
+          <input type="text" id="assets_do"/>
+        </div>
+      </div>
+
+      <label>My talents and personal gifts are...</label>
+      <textarea id="assets_talents"></textarea>
+
+      <label>One thing I have learned about myself is...</label>
+      <textarea id="assets_learned"></textarea>
+
+      <div class="row">
+        <div>
+          <label>For success I have to...</label>
+          <input type="text" id="assets_success"/>
+        </div>
+        <div>
+          <label>Study strategies that help me...</label>
+          <input type="text" id="assets_study_strats"/>
+        </div>
+      </div>
+
+      <label>Strategies I use when I am confused...</label>
+      <textarea id="assets_confused_strats"></textarea>
+    </div>
+
+    <div class="card slider-group">
+      <h3>Environment Preferences (sliders)</h3>
+      <div class="slider-row">
+        <div>Volume (Quiet - Loud)</div>
+        <input type="range" id="slider_volume" min="0" max="100" value="50" />
+        <div><span id="val_volume">50</span></div>
+      </div>
+      <div class="slider-row">
+        <div>Light (Dim -  Bright)</div>
+        <input type="range" id="slider_light" min="0" max="100" value="50" />
+        <div><span id="val_light">50</span></div>
+      </div>
+      <div class="slider-row">
+        <div>Social (Private - Public)</div>
+        <input type="range" id="slider_social" min="0" max="100" value="50" />
+        <div><span id="val_social">50</span></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="save">Submit Response</button>
+      <button class="ghost" id="clear-form">Clear Form</button>
+    </div>
+  </section>
+
+  <!-- Dashboard -->
+  <section class="card" id="dashboard" style="display:none">
+    <h2>Teacher Dashboard</h2>
+    <p class="muted">Analyze class responses (stored in this browser&#39;s localStorage). Export CSV for archives or further analysis.</p>
+
+    <div class="actions">
+      <button id="refresh">Refresh Data</button>
+      <button id="export">Export CSV</button>
+      <button class="ghost" id="wipe">Wipe All Data (local)</button>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Snapshot</h3>
+        <table>
+          <tr><th>Total responses</th><td id="stat_count">0</td></tr>
+          <tr><th>Median Volume</th><td id="stat_volume">–</td></tr>
+          <tr><th>Median Light</th><td id="stat_light">–</td></tr>
+          <tr><th>Median Social</th><td id="stat_social">–</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Top Themes - Needs & Stressors</h3>
+        <div id="top_keywords" class="muted"> - </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Slider Distributions</h3>
+        <canvas id="chart_volume"></canvas>
+      </div>
+      <div class="card">
+        <h3>Slider Distributions</h3>
+        <canvas id="chart_light"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Slider Distributions</h3>
+      <canvas id="chart_social"></canvas>
+    </div>
+
+    <div class="card">
+      <h3>Recent Submissions</h3>
+      <table id="table_recent">
+        <thead>
+          <tr>
+            <th>When</th><th>Name</th><th>Class</th><th>Desires (topics)</th><th>Needs (challenge)</th><th>Stress when…</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    Built for offline classroom use. Data is saved only in your browser storage.
+  </div>
+</div>
+
+<script>
+// --------- Utilities ---------
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+function nowISO(){ return new Date().toISOString(); }
+
+function median(arr){
+  if(!arr.length) return null;
+  const a = [...arr].sort((x,y)=>x-y);
+  const mid = Math.floor(a.length/2);
+  return a.length%2? a[mid] : (a[mid-1]+a[mid])/2;
+}
+
+function tokenize(text){
+  if(!text) return [];
+  return text.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(Boolean);
+}
+
+const STOP = new Set("a an and the is are to of in on at for with when i me my it this that we our us their them you your from be have has had or as if so but because than then by about into over under after before while during more most many much few lot lots very really just can cannot could should would might will do does did not no yes".split(/\s+/));
+
+function keywordCounts(texts, topN=15){
+  const freq = new Map();
+  (texts||[]).forEach(t => tokenize(t).forEach(w=>{
+    if(!STOP.has(w) && w.length>2){
+      freq.set(w, (freq.get(w)||0)+1);
+    }
+  }));
+  return [...freq.entries()].sort((a,b)=>b[1]-a[1]).slice(0, topN);
+}
+
+function saveResponses(resp){
+  const key = "learning_dna_responses";
+  const data = JSON.parse(localStorage.getItem(key) || "[]");
+  data.push(resp);
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+function loadResponses(){
+  return JSON.parse(localStorage.getItem("learning_dna_responses") || "[]");
+}
+
+function clearResponses(){
+  localStorage.removeItem("learning_dna_responses");
+}
+
+// --------- Tabs ---------
+$$(".tab").forEach(tab=>{
+  tab.addEventListener("click", ()=>{
+    $$(".tab").forEach(t=>t.classList.remove("active"));
+    tab.classList.add("active");
+    const id = tab.dataset.tab;
+    $("#student").style.display = (id==="student") ? "" : "none";
+    $("#dashboard").style.display = (id==="dashboard") ? "" : "none";
+    if(id==="dashboard"){ renderDashboard(); }
+  });
+});
+
+// --------- Sliders live values ---------
+["volume","light","social"].forEach(k=>{
+  const s = $("#slider_"+k);
+  const v = $("#val_"+k);
+  s.addEventListener("input", ()=> v.textContent = s.value);
+  v.textContent = s.value;
+});
+
+// --------- Save form ---------
+$("#save").addEventListener("click", ()=>{
+  const resp = {
+    ts: nowISO(),
+    name: $("#name").value.trim(),
+    clazz: $("#clazz").value.trim(),
+    desires_goals: $("#desires_goals").value.trim(),
+    desires_hobbies: $("#desires_hobbies").value.trim(),
+    desires_topics: $("#desires_topics").value.trim(),
+    desires_space: $("#desires_space").value.trim(),
+    desires_because: $("#desires_because").value.trim(),
+    needs_grow: $("#needs_grow").value.trim(),
+    needs_challenge: $("#needs_challenge").value.trim(),
+    needs_stress_when: $("#needs_stress_when").value.trim(),
+    needs_stress_need: $("#needs_stress_need").value.trim(),
+    needs_study_place: $("#needs_study_place").value.trim(),
+    assets_learn: $("#assets_learn").value.trim(),
+    assets_do: $("#assets_do").value.trim(),
+    assets_talents: $("#assets_talents").value.trim(),
+    assets_learned: $("#assets_learned").value.trim(),
+    assets_success: $("#assets_success").value.trim(),
+    assets_study_strats: $("#assets_study_strats").value.trim(),
+    assets_confused_strats: $("#assets_confused_strats").value.trim(),
+    vol: +$("#slider_volume").value,
+    light: +$("#slider_light").value,
+    social: +$("#slider_social").value
+  };
+  saveResponses(resp);
+  alert("Response saved locally. Thank you!");
+  // Optionally clear the form
+  // clearForm();
+});
+
+$("#clear-form").addEventListener("click", clearForm);
+function clearForm(){
+  $$("input[type='text'], textarea").forEach(el=>el.value="");
+  ["volume","light","social"].forEach(k=>{
+    const s = $("#slider_"+k); s.value=50; $("#val_"+k).textContent="50";
+  });
+}
+
+// --------- Dashboard ---------
+$("#refresh").addEventListener("click", renderDashboard);
+$("#wipe").addEventListener("click", ()=>{
+  if(confirm("This will delete ALL locally saved responses in this browser. Continue?")){
+    clearResponses();
+    renderDashboard();
+  }
+});
+
+function renderDashboard(){
+  const rows = loadResponses();
+  // Snapshot numbers
+  $("#stat_count").textContent = rows.length;
+  $("#stat_volume").textContent = rows.length? median(rows.map(r=>r.vol)).toFixed(1) : "–";
+  $("#stat_light").textContent = rows.length? median(rows.map(r=>r.light)).toFixed(1) : "–";
+  $("#stat_social").textContent = rows.length? median(rows.map(r=>r.social)).toFixed(1) : "–";
+
+  // Top needs & stress keywords
+  const top = keywordCounts(rows.map(r => (r.needs_challenge||"")+" "+(r.needs_stress_when||"")));
+  $("#top_keywords").innerHTML = top.length? top.map(([w,c])=>`<span class="pill">${w} · ${c}</span>`).join("") : "–";
+
+  // Recent table
+  const tbody = $("#table_recent tbody");
+  tbody.innerHTML = "";
+  rows.slice(-10).reverse().forEach(r=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${new Date(r.ts).toLocaleString()}</td>
+                    <td>${escapeHtml(r.name||"")}</td>
+                    <td>${escapeHtml(r.clazz||"")}</td>
+                    <td>${escapeHtml(r.desires_topics||"")}</td>
+                    <td>${escapeHtml(r.needs_challenge||"")}</td>
+                    <td>${escapeHtml(r.needs_stress_when||"")}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Charts
+  drawHistogram($("#chart_volume"), rows.map(r=>r.vol), "Volume");
+  drawHistogram($("#chart_light"), rows.map(r=>r.light), "Light");
+  drawHistogram($("#chart_social"), rows.map(r=>r.social), "Social");
+}
+
+function escapeHtml(str){
+  return (str||"").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+}
+
+function drawHistogram(canvas, data, label){
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width = canvas.clientWidth*2;
+  const h = canvas.height = 240*2;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle = "#e2e8f0";
+  ctx.lineWidth = 2;
+
+  // axes
+  const pad = 40;
+  ctx.beginPath();
+  ctx.moveTo(pad, h-pad);
+  ctx.lineTo(w-pad, h-pad);
+  ctx.moveTo(pad, h-pad);
+  ctx.lineTo(pad, pad);
+  ctx.stroke();
+
+  // bins (0-100) -> 10 bins
+  const bins = new Array(10).fill(0);
+  data.forEach(v=>{
+    if(typeof v==="number" && v>=0 && v<=100){
+      const b = Math.min(9, Math.floor(v/10));
+      bins[b]++;
+    }
+  });
+
+  const maxv = Math.max(1, ...bins);
+  const bw = (w - 2*pad) / bins.length;
+  ctx.fillStyle = "#94a3b8";
+  bins.forEach((c,i)=>{
+    const bh = (h - 2*pad) * (c/maxv);
+    const x = pad + i*bw + 4;
+    const y = h - pad - bh;
+    ctx.fillRect(x, y, bw-8, bh);
+  });
+
+  // labels
+  ctx.fillStyle = "#0f172a";
+  ctx.font = "28px system-ui";
+  ctx.fillText(label+" (0–100)", pad, pad-10);
+
+  ctx.font = "24px system-ui";
+  for(let i=0;i<=10;i++){
+    const x = pad + i*bw;
+    const tick = Math.round(i*10);
+    ctx.fillText(""+tick, x-10, h-pad+28);
+    ctx.beginPath();
+    ctx.moveTo(x, h-pad-6);
+    ctx.lineTo(x, h-pad+6);
+    ctx.strokeStyle = "#e2e8f0";
+    ctx.stroke();
+  }
+}
+
+// --------- Export CSV ---------
+$("#export").addEventListener("click", ()=>{
+  const rows = loadResponses();
+  const headers = Object.keys(rows[0] || {
+    ts:"", name:"", clazz:"", desires_goals:"", desires_hobbies:"", desires_topics:"", desires_space:"", desires_because:"",
+    needs_grow:"", needs_challenge:"", needs_stress_when:"", needs_stress_need:"", needs_study_place:"",
+    assets_learn:"", assets_do:"", assets_talents:"", assets_learned:"", assets_success:"", assets_study_strats:"", assets_confused_strats:"",
+    vol:0, light:0, social:0
+  });
+  const csv = [headers.join(",")].concat(
+    rows.map(r => headers.map(h => `"${String(r[h]??"").replace(/"/g,'""')}"`).join(","))
+  ).join("\n");
+  const blob = new Blob([csv], {type:"text/csv"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "learning_dna_responses.csv";
+  a.click();
+});
+
+// Initial render if teacher tab auto-opened by history
+renderDashboard();
+</script>
+</body>
+</html>
+"""
+path = "/mnt/data/learning_dna_applet.html"
+with open(path, "w", encoding="utf-8") as f:
+    f.write(html)
+
+path

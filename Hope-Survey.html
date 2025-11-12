@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hope Survey - Growing Tomorrow's Citizens</title>
+<style>
+  :root{
+    --bg:#faf7ef;         /* warm off-white */
+    --card:#ffffff;       /* cards */
+    --ink:#2e2e2e;        /* deep gray text */
+    --muted:#6b6b6b;      /* muted gray */
+    --line:#e7e0cf;       /* warm divider */
+    --gold:#f6d776;       /* soft gold */
+    --gold2:#f3c64d;      /* deeper soft gold */
+    --ok:#168a44;         /* green */
+    --warn:#d48b07;       /* amber */
+    --low:#d13535;        /* red */
+    --accent:#3a3a3a;     /* header bg */
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  header{background:var(--accent);color:#fff;padding:16px 18px;text-align:center;border-bottom:3px solid var(--gold2)}
+  header h1{margin:0;font-size:22px;letter-spacing:0.2px}
+  header p{margin:6px 0 0 0;color:#e8e8e8}
+  .wrap{max-width:1024px;margin:20px auto;padding:0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 8px 18px rgba(0,0,0,0.05)}
+  h2{margin:0 0 10px 0}
+  label{font-weight:600;font-size:14px;margin-bottom:6px;display:block}
+  input[type="text"], input[type="password"], select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:14px}
+  .question{margin:10px 0}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  button{padding:10px 14px;border-radius:12px;border:1px solid var(--line);cursor:pointer;font-weight:700}
+  .primary{background:var(--gold2);color:#292929}
+  .ghost{background:#fff;color:#2e2e2e}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:8px;border-bottom:1px solid var(--line);text-align:center}
+  th{background:#fff3c2}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr 1fr} }
+  .kpi{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+  .kpi .v{font-size:26px;font-weight:800}
+  .kpi .l{font-size:12px;color:var(--muted)}
+  .kpi.low{border-color:#f7c0c0}
+  .kpi.warn{border-color:#ffe3a3}
+  .kpi.ok{border-color:#bfe9cc}
+  .badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;margin:4px;font-size:12px}
+  canvas{width:100%;height:260px;border:1px solid var(--line);border-radius:12px;background:#fff}
+  .bar-legend{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:#fff}
+  .dot{width:10px;height:10px;border-radius:50%}
+  .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.low{background:var(--low)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Hope Survey - Growing Tomorrow's Citizens</h1>
+  <p>Understanding Student Hope, Goals, and Efficacy</p>
+</header>
+
+<div class="wrap">
+
+  <section class="card" id="survey">
+    <h2>Student Survey</h2>
+    <label>Student Name (optional)
+      <input id="name" type="text" placeholder="First name or initials">
+    </label>
+    <label>Class or Section (optional)
+      <input id="clazz" type="text" placeholder="e.g., 7A, Algebra 1">
+    </label>
+    <div id="questions"></div>
+    <div class="actions">
+      <button class="primary" id="submit">Submit Response</button>
+      <button class="ghost" id="clear">Clear</button>
+      <button class="ghost" id="openDash">Open Teacher Dashboard</button>
+    </div>
+    <div class="hint">All responses are saved locally on this device only.</div>
+  </section>
+
+  <section class="card" id="dashboard" style="display:none">
+    <h2>Teacher Dashboard</h2>
+    <div id="gate">
+      <label>Enter password to view dashboard
+        <input id="pw" type="password" placeholder="Password (default: teacher)">
+      </label>
+      <div class="actions">
+        <button class="primary" id="unlock">Unlock</button>
+        <button class="ghost" id="closeDash">Close</button>
+      </div>
+      <div class="hint">You can change the password in the code by editing the PASSWORD constant.</div>
+    </div>
+
+    <div id="dash" style="display:none">
+      <div class="grid">
+        <div class="kpi" id="k_total"><div class="v" data-val="0">0</div><div class="l">Total Responses</div></div>
+        <div class="kpi" id="k_index"><div class="v" data-val="0">-</div><div class="l">Hope Index (percent Yes)</div></div>
+        <div class="kpi" id="k_pf"><div class="v" data-val="0">-</div><div class="l">Past and Future (Q1 to Q4)</div></div>
+        <div class="kpi" id="k_goals"><div class="v" data-val="0">-</div><div class="l">Goal Orientation (Q5 to Q6)</div></div>
+      </div>
+      <div class="grid" style="margin-top:12px">
+        <div class="kpi" id="k_eff"><div class="v" data-val="0">-</div><div class="l">Efficacy (Q7 to Q10)</div></div>
+        <div class="kpi" id="k_school"><div class="v" data-val="0">-</div><div class="l">School vs Outside</div></div>
+        <div class="kpi" id="k_future"><div class="v" data-val="0">-</div><div class="l">Future vs Past</div></div>
+        <div class="kpi"><div class="v" id="mode">Local</div><div class="l">Data Mode</div></div>
+      </div>
+
+      <div class="card">
+        <h3>Per Question Yes Rate</h3>
+        <div class="bar-legend">
+          <span class="chip"><span class="dot ok"></span> Above 75 percent (strong)</span>
+          <span class="chip"><span class="dot warn"></span> 50 to 75 percent (moderate)</span>
+          <span class="chip"><span class="dot low"></span> Below 50 percent (needs support)</span>
+        </div>
+        <canvas id="chart"></canvas>
+      </div>
+
+      <div class="card">
+        <h3>Automatic Insights</h3>
+        <div id="insights" class="hint">No data yet.</div>
+      </div>
+
+      <div class="card">
+        <h3>Recent Submissions</h3>
+        <table id="tbl">
+          <thead><tr><th>When</th><th>Name</th><th>Class</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Q5</th><th>Q6</th><th>Q7</th><th>Q8</th><th>Q9</th><th>Q10</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="refresh">Refresh</button>
+        <button class="ghost" id="export">Export CSV</button>
+        <button class="ghost" id="print">Print</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+// Config
+const PASSWORD = "teacher";
+const KEY = "hope_survey_local_rows";
+
+// Questions
+const QUESTIONS = [
+  "I have been successful in school in the past.",
+  "I have been successful outside school in the past.",
+  "I will be successful in school in the future.",
+  "I will be successful outside school in the future.",
+  "I have goals for my future.",
+  "I will be able to get the knowledge and skills I need to pursue my goals.",
+  "I have access to many resources to help me when I am challenged.",
+  "I can think of many ways to solve problems.",
+  "I can identify and rely on my personal strengths.",
+  "I have strategies to compensate for any limitations or challenges I face."
+];
+
+// Helpers
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+function nowISO(){ return new Date().toISOString(); }
+function loadRows(){ return JSON.parse(localStorage.getItem(KEY) || "[]"); }
+function saveRow(r){ const a=loadRows(); a.push(r); localStorage.setItem(KEY, JSON.stringify(a)); }
+function avg(a){ return a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0; }
+function yes(v){ return String(v).toLowerCase().startsWith("y"); }
+function kpiClass(v){ if(!Number.isFinite(v)) return ""; if(v<0.5) return "low"; if(v<0.75) return "warn"; return "ok"; }
+function esc(s){ return String(s||"").replace(/[&<>"]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m])); }
+
+// Render survey
+function renderSurvey(){
+  const wrap = $("#questions"); wrap.innerHTML = "";
+  QUESTIONS.forEach((txt,i)=>{
+    const row = document.createElement("div");
+    row.className = "question";
+    row.innerHTML = '<label>'+(i+1)+'. '+esc(txt)+'</label>' +
+                    '<select id="q'+i+'"><option value="">Select</option><option>Yes</option><option>No</option></select>';
+    wrap.appendChild(row);
+  });
+}
+renderSurvey();
+
+// Form handlers
+$("#submit").addEventListener("click", ()=>{
+  const name = $("#name").value.trim();
+  const clazz = $("#clazz").value.trim();
+  const answers = [];
+  for(let i=0;i<QUESTIONS.length;i++){
+    const v = $("#q"+i).value;
+    if(!v){ alert("Please answer all questions."); return; }
+    answers.push(v);
+  }
+  saveRow({ ts: nowISO(), name, clazz, q: answers });
+  alert("Thanks for completing the survey!");
+  clearForm();
+});
+$("#clear").addEventListener("click", clearForm);
+function clearForm(){ $("#name").value=""; $("#clazz").value=""; $$("#questions select").forEach(s=>s.value=""); }
+
+// Dashboard open/close
+$("#openDash").addEventListener("click", ()=>{
+  $("#dashboard").style.display = "";
+  $("#gate").style.display = "";
+  $("#dash").style.display = "none";
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+$("#closeDash").addEventListener("click", ()=>{ $("#dashboard").style.display = "none"; });
+
+// Unlock
+$("#unlock").addEventListener("click", ()=>{
+  if($("#pw").value.trim() === PASSWORD){
+    $("#gate").style.display = "none";
+    $("#dash").style.display = "";
+    renderAll();
+  }else{
+    alert("Incorrect password.");
+  }
+});
+
+// Export and Print
+$("#export").addEventListener("click", ()=>{
+  const rows = loadRows();
+  if(!rows.length) return alert("No data to export.");
+  const headers = ["ts","name","clazz","q1","q2","q3","q4","q5","q6","q7","q8","q9","q10"];
+  const lines = [headers.join(",")].concat(
+    rows.map(r => [r.ts,r.name||"",r.clazz||"",...(r.q||[])]
+      .map(x => '"' + String(x).replace(/"/g,'""') + '"').join(","))
+  );
+  const blob = new Blob([lines.join("\n")], {type:"text/csv"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "hope_survey_responses.csv";
+  a.click();
+});
+$("#print").addEventListener("click", ()=>window.print());
+
+// Refresh
+$("#refresh").addEventListener("click", renderAll);
+
+// Analytics
+function summarize(rows){
+  const n = rows.length;
+  const yesCounts = new Array(10).fill(0);
+  rows.forEach(r => (r.q||[]).forEach((v,i)=>{ if(yes(v)) yesCounts[i]++; }));
+  const rates = yesCounts.map(c => n? c/n : 0);
+  const hopeIndex = avg(rates);
+  const pf = avg(rates.slice(0,4));
+  const goals = avg(rates.slice(4,6));
+  const eff = avg(rates.slice(6,10));
+  const schoolVsOutside = avg([(rates[0]-rates[1]), (rates[2]-rates[3])]); // positive means higher in school
+  const futureVsPast = avg(rates.slice(2,4)) - avg(rates.slice(0,2));      // positive means future higher
+  return { n, rates, hopeIndex, pf, goals, eff, schoolVsOutside, futureVsPast };
+}
+
+function renderKPIs(s){
+  $("#k_total .v").textContent = s.n;
+  const set = (id,val)=>{
+    const box = $(id);
+    const v = box.querySelector(".v");
+    v.textContent = s.n ? (val*100).toFixed(0) + "%" : "-";
+    box.classList.remove("low","warn","ok");
+    box.classList.add(kpiClass(val));
+  };
+  set("#k_index", s.hopeIndex);
+  set("#k_pf", s.pf);
+  set("#k_goals", s.goals);
+  set("#k_eff", s.eff);
+  $("#k_school .v").textContent = s.n ? (s.schoolVsOutside*100).toFixed(0) + "%" : "-";
+  $("#k_future .v").textContent = s.n ? (s.futureVsPast*100).toFixed(0) + "%" : "-";
+  $("#mode").textContent = "Local";
+}
+
+function renderChart(rates){
+  const c = $("#chart");
+  const ctx = c.getContext("2d");
+  const w = c.width = c.clientWidth * 2;
+  const h = c.height = 260 * 2;
+  const pad = 40;
+  ctx.clearRect(0,0,w,h);
+
+  // axes
+  ctx.strokeStyle = "#e0d7bf";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(pad, pad);
+  ctx.lineTo(pad, h - pad);
+  ctx.lineTo(w - pad, h - pad);
+  ctx.stroke();
+
+  // bars
+  const bw = (w - 2*pad) / rates.length;
+  rates.forEach((v,i)=>{
+    const x = pad + i*bw + 6;
+    const bh = (h - 2*pad) * v;
+    const y = h - pad - bh;
+    let color = "var(--ok)";
+    if(v < 0.5) color = "var(--low)";
+    else if(v < 0.75) color = "var(--warn)";
+    // Resolve CSS var to hex for canvas
+    const tmp = getComputedStyle(document.documentElement).getPropertyValue(color.replace("var","").replace("(","").replace(")","").trim());
+    ctx.fillStyle = tmp || (v < 0.5 ? "#d13535" : (v < 0.75 ? "#d48b07" : "#168a44"));
+    ctx.fillRect(x, y, bw - 12, bh);
+    ctx.fillStyle = "#2e2e2e";
+    ctx.font = "28px system-ui";
+    ctx.fillText("Q"+(i+1), x+2, h - pad + 28);
+    ctx.fillText(Math.round(v*100)+"%", x+2, y - 6);
+  });
+}
+
+function renderRecent(rows){
+  const tb = $("#tbl tbody");
+  tb.innerHTML = "";
+  rows.slice(-10).reverse().forEach(r=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>"+new Date(r.ts).toLocaleString()+"</td>"+
+                   "<td>"+esc(r.name)+"</td>"+
+                   "<td>"+esc(r.clazz)+"</td>"+
+                   (r.q||[]).map(v=>"<td>"+esc(v)+"</td>").join("");
+    tb.appendChild(tr);
+  });
+}
+
+function renderInsights(s){
+  const box = $("#insights");
+  if(!s.n){ box.textContent = "No data yet."; return; }
+  const out = [];
+  const low = x=>x<0.5, high = x=>x>0.75;
+  if(high(s.hopeIndex)) out.push("Overall hope is strong. Maintain high challenge and high support.");
+  else if(low(s.hopeIndex)) out.push("Overall hope appears low. Teach explicit goal setting and strategy routines.");
+  else out.push("Overall hope is moderate. Target specific areas below.");
+  if(s.schoolVsOutside > 0.05) out.push("Hope is higher in school than outside. Extend classroom strategies to home routines.");
+  else if(s.schoolVsOutside < -0.05) out.push("Hope is higher outside school than inside. Review relevance, climate, and supports.");
+  if(s.futureVsPast > 0.05) out.push("Future outlook exceeds past experience. Convert aspirations into concrete plans.");
+  else if(s.futureVsPast < -0.05) out.push("Past experience exceeds future outlook. Build visible pathways to next steps.");
+  if(low(s.goals)) out.push("Goal orientation is low. Use short cycles: set, act, reflect.");
+  if(low(s.eff)) out.push("Efficacy and resources are low. Co-create a menu of strategies and help seeking norms.");
+  box.innerHTML = out.map(x=>'<span class="badge">'+esc(x)+'</span>').join(" ");
+}
+
+function renderAll(){
+  const rows = loadRows();
+  const s = summarize(rows);
+  renderKPIs(s);
+  renderChart(s.rates);
+  renderRecent(rows);
+  renderInsights(s);
+}
+</script>
+</body>
+</html>
+"""
+
+path = "/mnt/data/hope_survey_warm_local_dashboard.html"
+with open(path, "w", encoding="utf-8") as f:
+    f.write(html)
+
+path

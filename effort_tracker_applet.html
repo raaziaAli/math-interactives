@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Effort Tracker - Growing Tomorrow's Citizens</title>
+<style>
+  :root{
+    --bg:#faf7ef; --card:#ffffff; --ink:#2e2e2e; --muted:#6b6b6b; --line:#e7e0cf;
+    --gold:#f6d776; --gold2:#f3c64d; --ok:#168a44; --warn:#d48b07; --low:#d13535; --accent:#3a3a3a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  header{background:var(--accent);color:#fff;padding:16px 18px;text-align:center;border-bottom:3px solid var(--gold2)}
+  header h1{margin:0;font-size:22px}
+  header p{margin:6px 0 0 0;color:#e8e8e8}
+  .wrap{max-width:1024px;margin:20px auto;padding:0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 8px 18px rgba(0,0,0,0.05)}
+  h2{margin:0 0 10px 0}
+  label{font-weight:600;font-size:14px;margin-bottom:6px;display:block}
+  input[type="text"], input[type="password"], select, textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:14px}
+  textarea{min-height:60px;resize:vertical}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:900px){ .row{grid-template-columns:1fr} }
+  .question{border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;background:#fff}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  button{padding:10px 14px;border-radius:12px;border:1px solid var(--line);cursor:pointer;font-weight:700}
+  .primary{background:var(--gold2);color:#292929}
+  .ghost{background:#fff;color:#2e2e2e}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:8px;border-bottom:1px solid var(--line);text-align:center}
+  th{background:#fff3c2}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr 1fr} }
+  .kpi{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+  .kpi .v{font-size:26px;font-weight:800}
+  .kpi .l{font-size:12px;color:var(--muted)}
+  .kpi.low{border-color:#f7c0c0}
+  .kpi.warn{border-color:#ffe3a3}
+  .kpi.ok{border-color:#bfe9cc}
+  .badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;margin:4px;font-size:12px}
+  canvas{width:100%;height:260px;border:1px solid var(--line);border-radius:12px;background:#fff}
+</style>
+</head>
+<body>
+<header>
+  <h1>Effort Tracker - Growing Tomorrow's Citizens</h1>
+  <p>Reflecting on habits that drive learning effort</p>
+</header>
+
+<div class="wrap">
+
+  <section class="card" id="survey">
+    <h2>Student Effort Tracker</h2>
+    <p class="hint">Score each category from 1 to 4 (1=rarely, 2=sometimes, 3=most often, 4=consistently). Add notes to improve or to share strategies.</p>
+    <label>Student Name (optional)
+      <input id="name" type="text" placeholder="First name or initials">
+    </label>
+    <label>Class or Section (optional)
+      <input id="clazz" type="text" placeholder="e.g., 7A, Algebra 1">
+    </label>
+
+    <div id="questions"></div>
+
+    <div class="actions">
+      <button class="primary" id="submit">Submit Response</button>
+      <button class="ghost" id="clear">Clear</button>
+      <button class="ghost" id="openDash">Open Teacher Dashboard</button>
+    </div>
+    <div class="hint">All responses are saved locally on this device only.</div>
+  </section>
+
+  <section class="card" id="dashboard" style="display:none">
+    <h2>Teacher Dashboard</h2>
+    <div id="gate">
+      <label>Enter password to view dashboard
+        <input id="pw" type="password" placeholder="Password (default: teacher)">
+      </label>
+      <div class="actions">
+        <button class="primary" id="unlock">Unlock</button>
+        <button class="ghost" id="closeDash">Close</button>
+      </div>
+      <div class="hint">Edit the PASSWORD constant in code to change the password.</div>
+    </div>
+
+    <div id="dash" style="display:none">
+      <div class="grid">
+        <div class="kpi" id="k_total"><div class="v">0</div><div class="l">Total Responses</div></div>
+        <div class="kpi" id="k_index"><div class="v">-</div><div class="l">Effort Index (avg of 7 categories)</div></div>
+        <div class="kpi" id="k_stability"><div class="v">-</div><div class="l">Consistency (std dev lower is better)</div></div>
+        <div class="kpi" id="k_growth"><div class="v">-</div><div class="l">Growth Potential (lowest category)</div></div>
+      </div>
+
+      <div class="card">
+        <h3>Average Score by Category (1 to 4)</h3>
+        <canvas id="chart"></canvas>
+      </div>
+
+      <div class="card">
+        <h3>Automatic Insights</h3>
+        <div id="insights" class="hint">No data yet.</div>
+      </div>
+
+      <div class="card">
+        <h3>Recent Submissions</h3>
+        <table id="tbl">
+          <thead>
+            <tr><th>When</th><th>Name</th><th>Class</th><th>Interest</th><th>Challenge</th><th>Expectations</th><th>Readiness</th><th>Initiation</th><th>Persistence</th><th>Engagement</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="refresh">Refresh</button>
+        <button class="ghost" id="export">Export CSV</button>
+        <button class="ghost" id="print">Print</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+// Config
+const PASSWORD = "teacher";
+const KEY = "effort_tracker_rows";
+
+// Categories (from Effort Tracker reproducible)
+const CATS = [
+  { key:"interest",     label:"Interest: I demonstrate a genuine desire to learn." },
+  { key:"challenge",    label:"Challenge: I strive to take intellectual risks, knowing I might fail but I will still learn." },
+  { key:"expectations", label:"Expectations: I set high expectations for myself and challenge myself to meet them." },
+  { key:"readiness",    label:"Readiness: I am always prepared for class and tasks." },
+  { key:"initiation",   label:"Initiation: When given a task, I get started right away." },
+  { key:"persistence",  label:"Persistence: I seek strategies to push through difficult moments until I complete the task." },
+  { key:"engagement",   label:"Engagement: I actively engage in class and teams, aiming to be a positive influence." }
+];
+
+// Render survey
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+function esc(s){ return String(s||"").replace(/[&<>"]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m])); }
+
+function renderSurvey(){
+  const wrap = $("#questions"); wrap.innerHTML = "";
+  CATS.forEach((c,i)=>{
+    const d = document.createElement("div"); d.className = "question";
+    d.innerHTML = `
+      <label>${i+1}. ${esc(c.label)}</label>
+      <div class="row">
+        <div>
+          <label>Score (1 to 4)</label>
+          <select id="score_${c.key}">
+            <option value="">Select</option>
+            <option value="1">1 - rarely</option>
+            <option value="2">2 - sometimes</option>
+            <option value="3">3 - most often</option>
+            <option value="4">4 - consistently</option>
+          </select>
+        </div>
+        <div>
+          <label>Improvement ideas (if score 1 or 2)</label>
+          <textarea id="imp_${c.key}" placeholder="What will you change next time?"></textarea>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Celebrations worth noting (if score 3 or 4)</label>
+          <textarea id="cel_${c.key}" placeholder="What worked that others could try?"></textarea>
+        </div>
+      </div>
+    `;
+    wrap.appendChild(d);
+  });
+}
+renderSurvey();
+
+// Persistence
+function loadRows(){ return JSON.parse(localStorage.getItem(KEY) || "[]"); }
+function saveRow(r){ const a=loadRows(); a.push(r); localStorage.setItem(KEY, JSON.stringify(a)); }
+
+// Form handlers
+$("#submit").addEventListener("click", ()=>{
+  const name = $("#name").value.trim();
+  const clazz = $("#clazz").value.trim();
+  const scores = {}; const imp = {}; const cel = {};
+  for(const c of CATS){
+    const v = parseInt($("#score_"+c.key).value,10);
+    if(!(v>=1 && v<=4)){ alert("Please select a score 1-4 for all categories."); return; }
+    scores[c.key] = v;
+    imp[c.key] = $("#imp_"+c.key).value.trim();
+    cel[c.key] = $("#cel_"+c.key).value.trim();
+  }
+  saveRow({ ts: new Date().toISOString(), name, clazz, scores, imp, cel });
+  alert("Thanks for completing the Effort Tracker!");
+  clearForm();
+});
+$("#clear").addEventListener("click", clearForm);
+function clearForm(){
+  $("#name").value = ""; $("#clazz").value = "";
+  CATS.forEach(c=>{ $("#score_"+c.key).value=""; $("#imp_"+c.key).value=""; $("#cel_"+c.key).value=""; });
+}
+
+// Dashboard open/close
+$("#openDash").addEventListener("click", ()=>{
+  $("#dashboard").style.display = "";
+  $("#gate").style.display = "";
+  $("#dash").style.display = "none";
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+$("#closeDash").addEventListener("click", ()=>{ $("#dashboard").style.display = "none"; });
+
+// Unlock
+$("#unlock").addEventListener("click", ()=>{
+  if($("#pw").value.trim() === PASSWORD){
+    $("#gate").style.display = "none";
+    $("#dash").style.display = "";
+    renderAll();
+  }else{
+    alert("Incorrect password.");
+  }
+});
+
+// Analytics
+function summarize(rows){
+  const n = rows.length;
+  const sums = {}; const avgs = {}; const arrs = {};
+  CATS.forEach(c=>{ sums[c.key]=0; arrs[c.key]=[]; });
+  rows.forEach(r=>{
+    CATS.forEach(c=>{
+      const v = Number(r.scores[c.key] || 0);
+      sums[c.key]+=v; arrs[c.key].push(v);
+    });
+  });
+  CATS.forEach(c=>{ avgs[c.key] = n? (sums[c.key]/n) : 0; });
+  const effortIndex = CATS.length? (CATS.reduce((a,c)=>a+avgs[c.key],0)/CATS.length) : 0;
+  // std deviation across category averages for stability
+  const m = effortIndex;
+  const variance = CATS.reduce((acc,c)=> acc + Math.pow((avgs[c.key]-m),2), 0) / (CATS.length||1);
+  const stddev = Math.sqrt(variance);
+  // find lowest and highest categories
+  let lowKey=null, lowVal=Infinity, highKey=null, highVal=-Infinity;
+  CATS.forEach(c=>{
+    const v = avgs[c.key];
+    if(v<lowVal){lowVal=v; lowKey=c.key;}
+    if(v>highVal){highVal=v; highKey=c.key;}
+  });
+  // collect top improvement themes from student notes for low categories (keywords)
+  const lowNotes = [].concat(...rows.map(r=>[r.imp[lowKey], r.imp[highKey]].filter(Boolean)));
+  return { n, avgs, effortIndex, stddev, lowKey, lowVal, highKey, highVal };
+}
+
+function clsFor(v){ if(v<2.5) return "low"; if(v<3.2) return "warn"; return "ok"; }
+
+function renderKPIs(s){
+  $("#k_total .v").textContent = s.n;
+  const idxBox = $("#k_index"); idxBox.querySelector(".v").textContent = s.n? s.effortIndex.toFixed(2) : "-";
+  idxBox.className = "kpi "+(s.n? clsFor(s.effortIndex):"");
+  const stBox = $("#k_stability"); stBox.querySelector(".v").textContent = s.n? s.stddev.toFixed(2) : "-";
+  const grBox = $("#k_growth"); grBox.querySelector(".v").textContent = s.n? (s.lowKey? (labelFor(s.lowKey)+" ("+s.lowVal.toFixed(2)+")") : "-") : "-";
+  grBox.className = "kpi "+(s.n? clsFor(s.lowVal):"");
+}
+function labelFor(key){ return CATS.find(c=>c.key===key).label.split(":")[0]; }
+
+function renderChart(avgs){
+  const c = document.getElementById("chart");
+  const ctx = c.getContext("2d");
+  const w = c.width = c.clientWidth*2;
+  const h = c.height = 260*2;
+  const pad = 40;
+  ctx.clearRect(0,0,w,h);
+  // axes
+  ctx.strokeStyle = "#e0d7bf"; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(pad,pad); ctx.lineTo(pad,h-pad); ctx.lineTo(w-pad,h-pad); ctx.stroke();
+  // y scale 0..4
+  for(let y=0;y<=4;y++){
+    const yy = h - pad - (h-2*pad)*(y/4);
+    ctx.fillStyle = "#6b6b6b"; ctx.font = "24px system-ui"; ctx.fillText(String(y), pad-24, yy+6);
+    ctx.strokeStyle = "#f0e9d6"; ctx.beginPath(); ctx.moveTo(pad,yy); ctx.lineTo(w-pad,yy); ctx.stroke();
+  }
+  // bars
+  const keys = CATS.map(c=>c.key);
+  const bw = (w - 2*pad) / keys.length;
+  keys.forEach((k,i)=>{
+    const v = avgs[k] || 0;
+    const x = pad + i*bw + 6;
+    const bh = (h - 2*pad) * (v/4);
+    const y = h - pad - bh;
+    let color = "#168a44"; if(v<2.5) color="#d13535"; else if(v<3.2) color="#d48b07";
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, bw-12, bh);
+    ctx.fillStyle = "#2e2e2e"; ctx.font = "24px system-ui";
+    ctx.fillText(shortLabel(k), x+2, h - pad + 24);
+    ctx.fillText(v.toFixed(2), x+2, y - 6);
+  });
+}
+function shortLabel(k){
+  const map = {interest:"Int",challenge:"Chal",expectations:"Exp",readiness:"Read",initiation:"Init",persistence:"Pers",engagement:"Eng"};
+  return map[k] || k;
+}
+
+function renderRecent(rows){
+  const tb = document.querySelector("#tbl tbody"); tb.innerHTML = "";
+  rows.slice(-10).reverse().forEach(r=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>"+new Date(r.ts).toLocaleString()+"</td>"+
+                   "<td>"+esc(r.name)+"</td>"+
+                   "<td>"+esc(r.clazz)+"</td>"+
+                   "<td>"+esc(r.scores.interest)+"</td>"+
+                   "<td>"+esc(r.scores.challenge)+"</td>"+
+                   "<td>"+esc(r.scores.expectations)+"</td>"+
+                   "<td>"+esc(r.scores.readiness)+"</td>"+
+                   "<td>"+esc(r.scores.initiation)+"</td>"+
+                   "<td>"+esc(r.scores.persistence)+"</td>"+
+                   "<td>"+esc(r.scores.engagement)+"</td>";
+    tb.appendChild(tr);
+  });
+}
+
+function renderInsights(s){
+  const box = document.getElementById("insights");
+  if(!s.n){ box.textContent = "No data yet."; return; }
+  const out = [];
+  if(s.effortIndex >= 3.2) out.push("Overall effort is strong. Maintain challenge with explicit reflection.");
+  else if(s.effortIndex >= 2.5) out.push("Overall effort is moderate. Target the lower categories for quick wins.");
+  else out.push("Overall effort is low. Co-design routines for readiness and initiation to build momentum.");
+  if(s.lowKey){
+    const lk = labelFor(s.lowKey);
+    out.push("Lowest category: "+lk+". Plan mini-lessons and peer strategy-shares.");
+  }
+  // Contrast highest vs lowest
+  if(s.highKey && s.lowKey && s.highKey !== s.lowKey){
+    const hk = labelFor(s.highKey);
+    out.push("Leverage strengths in "+hk+" to support growth in "+labelFor(s.lowKey)+".");
+  }
+  // Stability
+  if(s.stddev > 0.6) out.push("Consistency is uneven across categories. Normalize routines and exemplars.");
+  else out.push("Consistency looks reasonable across categories.");
+  box.innerHTML = out.map(x=>'<span class="badge">'+esc(x)+'</span>').join(" ");
+}
+
+function renderAll(){
+  const rows = loadRows();
+  const s = summarize(rows);
+  renderKPIs(s);
+  renderChart(s.avgs);
+  renderRecent(rows);
+  renderInsights(s);
+}
+
+// Buttons
+document.getElementById("refresh").addEventListener("click", renderAll);
+document.getElementById("print").addEventListener("click", ()=>window.print());
+document.getElementById("export").addEventListener("click", ()=>{
+  const rows = loadRows();
+  if(!rows.length) return alert("No data to export.");
+  const headers = ["ts","name","clazz","interest","challenge","expectations","readiness","initiation","persistence","engagement"];
+  const lines = [headers.join(",")].concat(
+    rows.map(r => [r.ts,r.name||"",r.clazz||"",r.scores.interest,r.scores.challenge,r.scores.expectations,r.scores.readiness,r.scores.initiation,r.scores.persistence,r.scores.engagement]
+      .map(x => '"' + String(x).replace(/"/g,'""') + '"').join(","))
+  );
+  const blob = new Blob([lines.join("\n")], {type:"text/csv"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "effort_tracker_responses.csv";
+  a.click();
+});
+</script>
+</body>
+</html>

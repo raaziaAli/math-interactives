@@ -1,65 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Math Interactives</title>
+  <meta charset="UTF-8" />
+  <title> Middle School Math – Interactive Activities</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+    :root {
+      --bg: #f5f7fb;
+      --card-bg: #ffffff;
+      --border-soft: #e5e7eb;
+      --accent: #1d4ed8;
+      --accent-soft: #e0e7ff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      font-family: system-ui, sans-serif;
-      background: #f9fafb;
-      padding: 2rem;
-      color: #111;
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #e5edff 0, #f9fafb 45%, #f3f4f6 100%);
+      color: var(--text-main);
     }
-    h1 {
-      color: #2563eb;
-      text-align: center;
+
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 32px 16px 40px;
     }
-    ul {
-      list-style: none;
-      padding: 0;
-      max-width: 500px;
-      margin: 2rem auto;
+
+    header { margin-bottom: 26px; }
+
+    header h1 {
+      font-size: clamp(1.9rem, 3vw, 2.4rem);
+      margin: 0 0 6px;
+      color: #111827;
     }
-    li {
-      margin: 0.8rem 0;
+
+    header p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.96rem;
+      max-width: 720px;
     }
-    a {
-      display: block;
-      padding: 1rem;
-      background: #ffffff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      text-decoration: none;
+
+    .tagline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .column-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 14px 14px 12px;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .column-card h2 {
+      margin: 0 0 6px;
       font-size: 1.1rem;
-      font-weight: 500;
-      color: #2563eb;
-      transition: 0.2s;
+      color: #111827;
     }
-    a:hover {
-      background: #2563eb;
-      color: white;
+
+    .column-card p.group-desc {
+      margin: 0 0 10px;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .activity-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .activity-item {
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #edf0f6;
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .activity-item a {
+      font-size: 0.9rem;
+      text-decoration: none;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .activity-item a:hover {
+      text-decoration: underline;
+    }
+
+    .activity-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin: 2px 0 0;
+    }
+
+    footer {
+      margin-top: 28px;
+      padding-top: 10px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: space-between;
+    }
+
+    @media (max-width: 720px) {
+      .page { padding: 22px 12px 30px; }
     }
   </style>
 </head>
 <body>
-  <h1>📘 Math Interactives</h1>
-  <p style="text-align:center">Click on any interactive to open it:</p>
-  <ul>
-    <li><a href="Fractions-ConceptualUnderstanding.html">Fraction Explorers</a></li>
-    <li><a href="TranslatingWords-Equations.html">Translating Words To Equations</a></li>
-    <li><a href="Percent-fraction-decimal.html">Percent-fraction-decimal-Converter</a></li>
-    <li><a href="SolvingEquations.html">SolvingEquations</a></li>
-    <li><a href="Percents.html">Percent Explorers</a></li>
-    <li><a href="Angle-Relationships.html">Angle Relationships</a></li>
-    <li><a href="AngleSum.html">Angle Sum</a></li>
-    <li><a href="MeatLoversPizza.html">Meat Lovers Pizza</a></li>
-    <li><a href="MultiplyingNumbersinSN.html">Multiplying Numbers in Scientific Notation</a></li>
-    <li><a href="Noodle-Cheese-Pan.html">Noodle & Cheese Pan</a></li>
-    <li><a href="Pizza.html">Pizza Interactive</a></li>
-    <li><a href="SimultaneousEquations.html">Simultaneous Equations</a></li>
-    <li><a href="Volume_Calculator.html">Volume Calculator</a></li>
-    <li><a href="SN-Exercise.html">SN-Exercise</a></li>
-  </ul>
+  <div class="page">
+    <header>
+      <div class="tagline">Math Interactive Practice</div>
+      <h1>Grade 8 Math – Interactive Activity Hub</h1>
+      <p>
+        Choose an activity to explore today. The page is organized into three groups:
+        Geometry & Measurement, Fractions & Percents, and Equations & Scientific Notation.
+        Click on any link to open the interactive page in your browser.
+      </p>
+    </header>
+
+    <div class="grid">
+      <!-- Column 1: Geometry & Measurement -->
+      <section class="column-card">
+        <h2>Geometry & Measurement</h2>
+        <p class="group-desc">
+          Explore angle relationships, angle sums, and volume through visual,
+          problem-based tasks.
+        </p>
+        <ul class="activity-list">
+          <li class="activity-item">
+            <a href="Angle-Rellationships.html">Angle Relationships</a>
+            <p class="activity-desc">
+              Investigate how angles relate (complementary, supplementary, vertical, etc.)
+              using diagrams and practice problems.
+            </p>
+          </li>
+          <li class="activity-item">
+            <a href="AngleSum.html">Angle Sum in Triangles</a>
+            <p class="activity-desc">
+              Discover and apply the angle sum of a triangle to find missing angles.
+            </p>
+          </li>
+          <li class="activity-item">
+            <a href="Volume_Calculator.html">Volume Calculator</a>
+            <p class="activity-desc">
+              Practice finding volume of 3D shapes and connect formulas to real-world contexts.
+            </p>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Column 2: Fractions, Percents & Ratios -->
+      <section class="column-card">
+        <h2>Fractions, Percents & Ratios</h2>
+        <p class="group-desc">
+          Build conceptual understanding of fractions, percents, and proportional reasoning
+          using food and real-life contexts.
+        </p>
+        <ul class="activity-list">
+          <li class="activity-item">
+            <a href="Fractions-ConceptualUnderstanding.html">Fractions – Conceptual Understanding</a>
+            <p class="activity-desc">
+              Visual models and tasks to deepen understanding of fractions and their meanings.
+            </p>
+          </li>
+          <li class="activity-item">
+            <a href="Percent-fraction-decimal.html">Percent–Fraction–Decimal</a>
+            <p class="activity-desc">
+              Practice converting between percents, fractions, and decimals.
+            </p>
+          </li>
+          <li class="activity-item">
+            <a href="Percents.html">Percents Practice</a>
+            <p class="activity-desc">
+              Work with percent increase, decrease, and real-world percentage problems.
+            </p>
+          </li>
+          <li class="activity-item">
+            <a href="Pizza.html">Pizza Fractions</a>
+            <p class="activity-desc">
+              Use pizza models to reason about fractions, sharing, and fair division.
+            </p>
+          </li>
+          <li class="activity-item">
+            <a href="MeatLoversPizza.html">Meat Lovers Pizza Task</a>
+            <p class="activity-desc">
+              Apply fraction and percent reasoning in a multi-step pizza problem.
+            </p>
+          </li>
+          <li class="activity-item">
+            <a href="Noodle-Cheese-Pan.html">Noodle and Cheese Pan</a>
+            <p class="activity-desc">
+              Solve a ratio/proportion situation using a noodle and cheese pan context.
+            </p>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Column 3: Equations & Scientific Notation -->
+      <section class="column-card">
+        <h2>Equations & Scientific Notation</h2>
+        <p class="group-desc">
+          Translate word problems, solve equations, and work with scientific notation.
+        </p>
+        <ul class="activity-list">
+          <li class="activity-item">
+            <a href="TranslatingWords-Equations.html">Translating Words to Equations</a>
+            <p class="activity-desc">
+              Practice turning real-world situations into algebraic equations.
+            </p>
+          </li>
+          <li class="activity-item">
+            <a href="SolvingEquations.html">Solving Equations</a>
+            <p class="activity-desc">
+              Solve one-step and multi-step equations and check your solutions.
+            </p>
+          </li>
+          <li class="activity-item">
+            <a href="SimultaneousEquations.html">Simultaneous Equations</a>
+            <p class="activity-desc">
+              Explore systems of equations and how two lines can intersect, be parallel, or coincide.
+            </p>
+          </li>
+          <li class="activity-item">
+            <a href="MultiplyingNumbersinSN.html">Multiplying Numbers in Scientific Notation</a>
+            <p class="activity-desc">
+              Learn how to multiply numbers written in scientific notation efficiently.
+            </p>
+          </li>
+          <li class="activity-item">
+            <a href="SN-Exercise.html">Scientific Notation Exercise</a>
+            <p class="activity-desc">
+              Additional practice with operations and comparisons in scientific notation.
+            </p>
+          </li>
+        </ul>
+      </section>
+    </div>
+
+    <footer>
+      <span>Grade 8 Math Interactive Activity Hub</span>
+      <span>Served via GitHub Pages</span>
+    </footer>
+  </div>
 </body>
 </html>

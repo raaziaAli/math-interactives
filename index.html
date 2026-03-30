@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Interactives — Activity Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f4f8;--surface:#fff;--navy:#1a2e4a;--navy2:#243d5e;
+  --teal:#00b894;--blue:#2980b9;--purple:#8e44ad;--amber:#f39c12;
+  --coral:#e74c3c;--green:#27ae60;--text:#1a2e4a;--muted:#5a7a9a;
+  --border:#dde8f0;--r:14px;
+}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.header{background:linear-gradient(135deg,var(--navy),var(--navy2));padding:32px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-icon{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--teal),var(--blue));display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 16px rgba(0,184,148,.35)}
+.brand-name{font-size:22px;font-weight:900;color:#fff;line-height:1}
+.brand-sub{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px}
+.back-btn{padding:9px 22px;border-radius:99px;border:1.5px solid rgba(255,255,255,.25);background:transparent;color:rgba(255,255,255,.8);font-size:13px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;text-decoration:none;transition:all .15s}
+.back-btn:hover{background:rgba(255,255,255,.12);color:#fff}
+
+.main{max-width:1200px;margin:0 auto;padding:48px 32px}
+.section-title{font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:16px;display:flex;align-items:center;gap:8px;margin-top:40px}
+.section-title:first-child{margin-top:0}
+.section-title::before{content:'';width:24px;height:2px;background:var(--teal);border-radius:1px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:12px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;text-decoration:none;display:flex;flex-direction:column;transition:all .2s;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:0;transition:opacity .2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(26,46,74,.12);border-color:transparent}
+.card:hover::before{opacity:1}
+.card.geom::before{background:linear-gradient(90deg,var(--purple),var(--blue))}
+.card.geom:hover{border-color:rgba(142,68,173,.2)}
+.card.frac::before{background:linear-gradient(90deg,var(--teal),var(--green))}
+.card.frac:hover{border-color:rgba(0,184,148,.2)}
+.card.eq::before{background:linear-gradient(90deg,var(--blue),var(--purple))}
+.card.eq:hover{border-color:rgba(41,128,185,.2)}
+.card.ratio::before{background:linear-gradient(90deg,var(--amber),var(--coral))}
+.card.ratio:hover{border-color:rgba(243,156,18,.2)}
+
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.card-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.card-badge{font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:99px;border:1px solid}
+.b-live{background:rgba(39,174,96,.1);color:var(--green);border-color:rgba(39,174,96,.2)}
+.card-title{font-size:15px;font-weight:900;color:var(--text);margin-bottom:5px;line-height:1.3}
+.card-desc{font-size:12px;color:var(--muted);line-height:1.6;flex:1;margin-bottom:14px}
+.card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border)}
+.card-subject{font-size:10px;font-weight:700;color:rgba(90,122,154,.6);text-transform:uppercase;letter-spacing:.07em}
+.card-arrow{width:26px;height:26px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);transition:all .2s}
+.card:hover .card-arrow{background:var(--teal);color:#fff;transform:translateX(3px)}
+
+@media(max-width:600px){.grid{grid-template-columns:1fr}.header{padding:20px 20px}.main{padding:28px 16px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="brand">
+    <div class="brand-icon">📐</div>
+    <div>
+      <div class="brand-name">Math Interactives</div>
+      <div class="brand-sub">Middle School · Grades 6–8 · 14 interactive tools</div>
+    </div>
+  </div>
+  <a class="back-btn" href="../index.html">← Back to portal</a>
+</div>
+
+<div class="main">
+
+  <!-- Geometry -->
+  <div class="section-title">Geometry & Angles</div>
+  <div class="grid">
+
+    <a class="card geom" href="Angle-Rellationships.html">
+      <div class="card-top">
+        <div class="card-icon" style="background:rgba(142,68,173,.1)">📐</div>
+        <span class="card-badge b-live">Live</span>
+      </div>
+      <div class="card-title">Transversal & Angle Relationships</div>
+      <div class="card-desc">Explore vertical, corresponding, alternate interior, alternate exterior, and co-interior angles. Cycling highlight shows each pair on a parallel lines diagram.</div>
+      <div class="card-footer"><span class="card-subject">Grade 8 · 8.G · Angles</span><div class="card-arrow">→</div></div>
+    </a>
+
+    <a class="card geom" href="AngleSum.html">
+      <div class="card-top">
+        <div class="card-icon" style="background:rgba(142,68,173,.1)">△</div>
+        <span class="card-badge b-live">Live</span>
+      </div>
+      <div class="card-title">Triangle Angle Sum Theorem</div>
+      <div class="card-desc">Drag vertices to explore any triangle. Cut the three angles out and watch them fold onto a straight line to prove they always sum to 180°.</div>
+      <div class="card-footer"><span class="card-subject">Grade 7–8 · Geometry · Proof</span><div class="card-arrow">→</div></div>
+    </a>
+
+    <a class="card geom" href="Volume_Calculator.html">
+      <div class="card-top">
+        <div class="card-icon" style="background:rgba(142,68,173,.1)">📦</div>
+        <span class="card-badge b-live">Live</span>
+      </div>
+      <div class="card-title">Volume Calculator</div>
+      <div class="card-desc">Interactive 3D canvas showing sphere, cylinder, and cone. Adjust radius and height with sliders and watch the volume update instantly with the formula displayed.</div>
+      <div class="card-footer"><span class="card-subject">Grade 7–8 · Volume · 3D Shapes</span><div class="card-arrow">→</div></div>
+    </a>
+
+  </div>
+
+  <!-- Fractions & Percents -->
+  <div class="section-title">Fractions, Percents & Decimals</div>
+  <div class="grid">
+
+    <a class="card frac" href="Fractions-ConceptualUnderstanding.html">
+      <div class="card-top">
+        <div class="card-icon" style="background:rgba(0,184,148,.1)">½</div>
+        <span class="card-badge b-live">Live</span>
+      </div>
+      <div class="card-title">Mixed Numbers Explorer</div>
+      <div class="card-desc">Visual fractions and division tool. Build fractions visually, convert between mixed numbers and improper fractions, and explore division with fraction models.</div>
+      <div class="card-footer"><span class="card-subject">Grade 6–7 · Fractions · Visual</span><div class="card-arrow">→</div></div>
+    </a>
+
+    <a class="card frac" href="Percent-fraction-decimal.html">
+      <div class="card-top">
+        <div class="card-icon" style="background:rgba(0,184,148,.1)">⇄</div>
+        <span class="card-badge b-live">Live</span>
+      </div>
+      <div class="card-title">Equivalence Explorer</div>
+      <div class="card-desc">See percents, fractions, and decimals all at once. Adjust one form and all three update simultaneously — builds deep understanding of equivalence.</div>
+      <div class="card-footer"><span class="card-subject">Grade 6–7 · Equivalence · Conversion</span><div class="card-arrow">→</div></div>
+    </a>
+
+    <a class="card frac" href="Percents.html">
+      <div class="card-top">
+        <div class="card-icon" style="background:rgba(0,184,148,.1)">%</div>
+        <span class="card-badge b-live">Live</span>
+      </div>
+      <div class="card-title">Percent Explorer</div>
+      <div class="card-desc">Double number lines, tape diagrams, and a built-in quiz for percent calculations. Covers percent of a quantity, percent increase and decrease.</div>
+      <div class="card-footer"><span class="card-subject">Grade 6–7 · Percents · 7.RP</span><div class="card-arrow">→</div></div>
+    </a>
+
+  </div>
+
+  <!-- Ratios -->
+  <div class="section-title">Ratios & Real-World Contexts</div>
+  <div class="grid">
+
+    <a class="card ratio" href="Pizza.html">
+      <div class="card-top">
+        <div class="card-icon" style="background:rgba(243,156,18,.1)">🍕</div>
+        <span class="card-badge b-live">Live</span>
+      </div>
+      <div class="card-title">Meat Lovers Pizza — Keep the Ratio</div>
+      <div class="card-desc">Maintain the correct topping ratios while scaling a pizza recipe using interactive sliders. Builds proportional reasoning in a delicious real-world context.</div>
+      <div class="card-footer"><span class="card-subject">Grade 7 · 7.RP · Ratios</span><div class="card-arrow">→</div></div>
+    </a>
+
+    <a class="card ratio" href="MeatLoversPizza.html">
+      <div class="card-top">
+        <div class="card-icon" style="background:rgba(243,156,18,.1)">🍕</div>
+        <span class="card-badge b-live">Live</span>
+      </div>
+      <div class="card-title">Meat Lovers Pizza — Advanced</div>
+      <div class="card-desc">Extended pizza ratio activity with fraction calculations and worksheet questions. Students work with unit fractions and rational number arithmetic.</div>
+      <div class="card-footer"><span class="card-subject">Grade 7 · 7.RP · Fractions</span><div class="card-arrow">→</div></div>
+    </a>
+
+    <a class="card ratio" href="Noodle-Cheese-Pan.html">
+      <div class="card-top">
+        <div class="card-icon" style="background:rgba(243,156,18,.1)">🧀</div>
+        <span class="card-badge b-live">Live</span>
+      </div>
+      <div class="card-title">Mac & Cheese — Noodle : Cheese : Pan</div>
+      <div class="card-desc">Maintain the 4:1:5 ratio using interactive sliders. Simple, reliable, and fun — drag one ingredient and watch the others scale proportionally.</div>
+      <div class="card-footer"><span class="card-subject">Grade 7 · 7.RP · Proportions</span><div class="card-arrow">→</div></div>
+    </a>
+
+  </div>
+
+  <!-- Equations -->
+  <div class="section-title">Equations & Scientific Notation</div>
+  <div class="grid">
+
+    <a class="card eq" href="TranslatingWords-Equations.html">
+      <div class="card-top">
+        <div class="card-icon" style="background:rgba(41,128,185,.1)">📝</div>
+        <span class="card-badge b-live">Live</span>
+      </div>
+      <div class="card-title">Translating Words into Equations</div>
+      <div class="card-desc">Interactive applet bridging word problems and algebra. Match verbal descriptions to their algebraic form — the critical first step before solving.</div>
+      <div class="card-footer"><span class="card-subject">Grade 7–8 · Algebra · Word Problems</span><div class="card-arrow">→</div></div>
+    </a>
+
+    <a class="card eq" href="SolvingEquations.html">
+      <div class="card-top">
+        <div class="card-icon" style="background:rgba(41,128,185,.1)">🔧</div>
+        <span class="card-badge b-live">Live</span>
+      </div>
+      <div class="card-title">Solving Linear Equations</div>
+      <div class="card-desc">Step-by-step visual equation solver with a work report and export feature. Covers one and two-step equations using the balance model and inverse operations.</div>
+      <div class="card-footer"><span class="card-subject">Grade 7–8 · 7.EE / 8.EE · Equations</span><div class="card-arrow">→</div></div>
+    </a>
+
+    <a class="card eq" href="SimultaneousEquations.html">
+      <div class="card-top">
+        <div class="card-icon" style="background:rgba(41,128,185,.1)">📈</div>
+        <span class="card-badge b-live">Live</span>
+      </div>
+      <div class="card-title">Graphing Simultaneous Equations</div>
+      <div class="card-desc">Enter two equations in ax + by = c form and plot both lines on a shared graph. The intersection point — the solution — is marked automatically.</div>
+      <div class="card-footer"><span class="card-subject">Grade 8 · 8.EE.C.8 · Systems</span><div class="card-arrow">→</div></div>
+    </a>
+
+    <a class="card eq" href="MultiplyingNumbersinSN.html">
+      <div class="card-top">
+        <div class="card-icon" style="background:rgba(41,128,185,.1)">🔢</div>
+        <span class="card-badge b-live">Live</span>
+      </div>
+      <div class="card-title">Multiplying in Scientific Notation</div>
+      <div class="card-desc">Drag-and-drop activity matching each multiplication step to its correct description. Superscripts displayed clearly — builds procedural fluency with scientific notation.</div>
+      <div class="card-footer"><span class="card-subject">Grade 8 · 8.EE.A.3–4 · Sci. Notation</span><div class="card-arrow">→</div></div>
+    </a>
+
+    <a class="card eq" href="SN-Exercise.html">
+      <div class="card-top">
+        <div class="card-icon" style="background:rgba(41,128,185,.1)">🔬</div>
+        <span class="card-badge b-live">Live</span>
+      </div>
+      <div class="card-title">Scientific Notation — Drag & Drop Exercise</div>
+      <div class="card-desc">Match each step in a scientific notation calculation to its correct description. Check your answers instantly and reveal the correct solution.</div>
+      <div class="card-footer"><span class="card-subject">Grade 8 · 8.EE · Scientific Notation</span><div class="card-arrow">→</div></div>
+    </a>
+
+  </div>
+</div>
+
+</body>
+</html>

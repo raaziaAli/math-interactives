@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Translating Words To Equations - Interactive Applet</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --ink:#202530; --muted:#556070; --card:#ffffff; --line:#ccd3e0; --brand:#2a6ee8;
+  }
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;margin:0}
+  .wrap{max-width:1100px;margin:24px auto 64px;padding:0 16px}
+  h1{margin:0 0 6px}
+  .mini{font-size:13px;color:var(--muted)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .spacer{flex:1}
+  .select,.text,.btn{border-radius:10px;border:1px solid var(--line);background:#f0f3f9;color:var(--ink);padding:10px 12px;font-size:14px}
+  .btn{cursor:pointer;background:var(--brand);color:#fff;border:none;transition:0.2s}
+  .btn:hover{filter:brightness(0.95)}
+  .btn.secondary{background:#fff;color:#1f55b5;border:1px solid var(--line)}
+  .btn.ghost{background:transparent;color:#1f55b5;border:1px dashed var(--line)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 2px 5px rgba(0,0,0,.08);padding:18px}
+  .equation{font-size:26px;text-align:center;margin:8px 0;color:#142033}
+  .status{margin-top:8px;color:#3d4657;font-weight:500}
+  .good{color:#126b26}
+  .bad{color:#9b1c1c}
+  code{background:#e7ecf6;padding:2px 5px;border-radius:4px}
+  details>summary{cursor:pointer;font-weight:700;user-select:none}
+  details>summary::-webkit-details-marker{display:none}
+  /* Study Guide table */
+  .kw-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+  .kw-table caption{font-weight:700;color:#3d4657;margin-bottom:6px}
+  .kw-table th,.kw-table td{border:1px solid var(--line);padding:8px 10px;vertical-align:top}
+  .kw-table th{background:#f3f6fc;text-align:left;width:160px}
+  .kw-table td ul{margin:0;padding-left:18px}
+  .kw-table td li{margin:2px 0}
+  /* print-friendly for PDF */
+  @media print{
+    body{background:#fff}
+    .no-print{display:none!important}
+    .card{box-shadow:none;border-color:#bbb}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Translating Words To Equations - Interactive Applet</h1>
+  <p class="mini">Practice turning English statements into linear equations, then solve and export a PDF report of your work. Includes a study guide summarizing the chapter keywords and steps.</p>
+  
+  <div class="row no-print" style="margin:12px 0 16px">
+    <label for="mode" class="mini">Generate</label>
+    <select id="mode" class="select">
+      <option value="addSub">Add/Subtract ("more than", "less than")</option>
+      <option value="multDiv">Multiply/Divide ("times", "quotient")</option>
+      <option value="fractions">Fractions ("three fourths of a number")</option>
+      <option value="mixed" selected>Mixed</option>
+    </select>
+    <label for="difficulty" class="mini">Difficulty</label>
+    <select id="difficulty" class="select">
+      <option value="easy">Easy</option>
+      <option value="std" selected>Standard</option>
+      <option value="challenge">Challenge</option>
+    </select>
+    <button id="btnNew" class="btn">New Statement</button>
+    <button id="btnHint" class="btn secondary">Hint</button>
+    <button id="btnRevealEq" class="btn secondary">Reveal Equation</button>
+    <div class="spacer"></div>
+    <span class="mini">Save & Export:</span>
+    <button id="btnSaveJSON" class="btn secondary" title="Download JSON snapshot">JSON</button>
+    <button id="btnExportTXT" class="btn secondary" title="Download text report">TXT</button>
+    <button id="btnExportPDF" class="btn secondary" title="Create a PDF via print dialog">PDF</button>
+    <label for="importJSON" class="btn ghost" title="Import a saved JSON">Import</label>
+    <input id="importJSON" type="file" accept="application/json" style="display:none"/>
+    <button id="btnSaveLocal" class="btn ghost" title="Save to this browser">Save</button>
+    <button id="btnLoadLocal" class="btn ghost" title="Load from this browser">Load</button>
+  </div>
+
+  <div id="work" class="card">
+    <div class="mini">Statement</div>
+    <div id="stmt" class="equation">Ñ</div>
+
+    <div class="row" style="margin-top:10px">
+      <input id="eqInput" class="text" placeholder="Type your equation (e.g., x + 12 = 30 or 3/4 x = -6)" style="min-width:340px"/>
+      <button id="btnCheckEq" class="btn">Check translation</button>
+      <button id="btnClear" class="btn secondary">Clear</button>
+    </div>
+    <div id="eqFeedback" class="status"></div>
+
+    <div class="row" style="margin-top:12px">
+      <input id="guess" class="text" placeholder="Solve it: enter x" style="width:200px"/>
+      <button id="btnCheckSol" class="btn secondary">Check solution</button>
+      <button id="btnRevealSol" class="btn">Reveal solution</button>
+    </div>
+    <div id="solFeedback" class="status"></div>
+
+    <h3 class="mini" style="margin-top:14px">Progress</h3>
+    <ol id="history" class="mini"></ol>
+  </div>
+
+  <details class="card" style="margin-top:16px">
+    <summary>Study Guide - Translating English Sentences into Equations</summary>
+    <div class="mini" style="margin-top:8px;line-height:1.6">
+      <h4>Steps to Solving Applied Problems</h4>
+      <ol>
+        <li><strong>Read</strong> the problem carefully (more than once). Identify what is asked.</li>
+        <li><strong>Choose</strong> a variable for the unknown.</li>
+        <li><strong>Translate</strong> the words into an equation using your variable.</li>
+        <li><strong>Solve</strong> the equation.</li>
+        <li><strong>Check & interpret</strong> the answer in context.</li>
+      </ol>
+      <h4>Key Words & Phrases</h4>
+      <table class="kw-table">
+        <caption>Common signal words used when translating sentences into equations</caption>
+        <tbody>
+          <tr>
+            <th>Addition</th>
+            <td>
+              <ul>
+                <li>sum</li>
+                <li>increased by</li>
+                <li>more than</li>
+                <li>plus</li>
+                <li>total</li>
+                <li>combined</li>
+                <li>added to</li>
+                <li>in all</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <th>Subtraction</th>
+            <td>
+              <ul>
+                <li>difference</li>
+                <li>decreased by</li>
+                <li>less than <span class="mini">(reverses order -k less than x  is <code>x - k</code>)</span></li>
+                <li>minus</li>
+                <li>fewer than</li>
+                <li>reduced by</li>
+                <li>take away</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <th>Multiplication</th>
+            <td>
+              <ul>
+                <li>product</li>
+                <li>times</li>
+                <li><em>of</em></li>
+                <li>factor of</li>
+                <li>doubled</li>
+                <li>tripled</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <th>Division</th>
+            <td>
+              <ul>
+                <li>quotient</li>
+                <li>divided by</li>
+                <li>ratio of</li>
+                <li>per</li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <th>equals</th>
+            <td>
+              <ul>
+                <li>is/are</li>
+                <li>was/were</li>
+                <li>will be</li>
+                <li>gives</li>
+                <li>yields</li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <h4> Algebra Basics Summary </h4>
+      <ul>
+        <li>Combine like terms; use Distributive Property when needed.</li>
+        <li>Addition/Multiplication Properties of Equality justify balance moves.</li>
+        <li>Always check solutions by substitution.</li>
+      </ul>
+    </div>
+  </details>
+</div>
+
+<script>
+(function(){
+  // ----- Linear expression utilities: parse ax + b from strings -----
+  function tidy(n){ if(Math.abs(n)<1e-12) return 0; return Number(n.toFixed(12)); }
+  function Expr(a,b){ this.a=a; this.b=b; }
+  function parseFractionToken(tok){ // supports "-3/4", "5", "0.5"
+    if(/^[+-]?\d+(?:\/\d+)?$/.test(tok)){
+      if(tok.indexOf('/')===-1) return Number(tok);
+      var p=tok.split('/'); var num=Number(p[0]), den=Number(p[1]); if(!isFinite(num)||!isFinite(den)||den===0) return NaN; return num/den;
+    }
+    var v = Number(tok); return isFinite(v) ? v : NaN;
+  }
+  function parseTerm(s){ // "2x", "-x", "3/4x", "7"
+    s=s.replace(/\s+/g,'').toLowerCase();
+    if(s.endsWith('x')){
+      var coef=s.slice(0,-1);
+      if(coef==='') return 1; if(coef==='+') return 1; if(coef==='-') return -1;
+      var f=parseFractionToken(coef); if(!isFinite(f)) throw new Error('bad coef');
+      return {a: tidy(f), b: 0};
+    } else {
+      var c=parseFractionToken(s); if(!isFinite(c)) throw new Error('bad const');
+      return {a:0,b:tidy(c)};
+    }
+  }
+  function parseExpr(str){
+    // Accept forms like: 2x-5, x+12, -3/4x + 7, 7 - x  (we'll normalize unary +/-, and split by + or - keeping signs)
+    var s = str.replace(/\u2212/g,'-').replace(/\s+/g,'');
+    if(!s) return new Expr(0,0);
+    // Insert explicit + before leading term if needed
+    if(s[0]!=='-' && s[0]!=='+') s='+'+s;
+    // Split into signed chunks like +2x, -5, -x, +3/4x
+    var re=/([+-])([^+-]+)/g, m, a=0,b=0, idx=0;
+    while((m=re.exec(s))!==null){ idx = m.index + m[0].length; var sign=m[1]==='-'?-1:1; var t=m[2];
+      if(t.endsWith('x')){
+        var coef=t.slice(0,-1); if(coef==='') coef='1'; if(coef==='+') coef='1'; if(coef==='-') coef='-1';
+        var v=parseFractionToken(coef); if(!isFinite(v)) throw new Error('term'); a += sign* v; 
+      }else{
+        var c=parseFractionToken(t); if(!isFinite(c)) throw new Error('const'); b += sign* c;
+      }
+    }
+    return new Expr(tidy(a), tidy(b));
+  }
+  function parseEquation(eqStr){
+    var parts = String(eqStr).split('='); if(parts.length!==2) throw new Error('need =');
+    return {L: parseExpr(parts[0]), R: parseExpr(parts[1])};
+  }
+  function eqToString(E){ function s(e){ let sx=''; if(e.a!==0){ if(e.a===1) sx+='x'; else if(e.a===-1) sx+='-x'; else sx+=e.a+'x'; } if(e.b!==0){ if(sx) sx+=(e.b>0?' + ':' - ')+Math.abs(e.b); else sx+=e.b; } return sx||'0'; } return s(E.L)+' = '+s(E.R); }
+  function sameLinear(E1,E2){ // E1 and E2 equivalent after simplifying to ax+b = cx+d -> (a-c)x = (d-b)
+    function norm(E){ return {A: tidy(E.L.a - E.R.a), B: tidy(E.R.b - E.L.b)}; }
+    var n1 = norm(E1), n2 = norm(E2); return (n1.A===0 && n2.A===0) ? (n1.B===0 && n2.B===0) : (tidy(n1.A/n2.A)===1 && tidy(n1.B/n2.B)===1);
+  }
+  function solve(E){ var A=tidy(E.L.a - E.R.a), B=tidy(E.R.b - E.L.b); if(A===0){ if(B===0) return {kind:'identity'}; return {kind:'none'}; } return {kind:'one', x: tidy(B/A)}; }
+
+  // ----- Problem generator -----
+  function ri(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+  function sg(){ return Math.random()<0.5? -1: 1; }
+  function pick(arr){ return arr[ri(0,arr.length-1)]; }
+
+  function genAddSub(diff){
+    var xStar = sg()*ri(1,15), k = sg()*ri(1,15);
+    var type = pick(['more','less','difference','decreasedBy']);
+    if(type==='more'){
+      // "k more than a number is n" => x + k = n
+      var n = xStar + k; return {text: cap(k+" more than a number is "+n+"."), eq:{L:new Expr(1,k),R:new Expr(0,n)}};
+    } else if(type==='less'){
+      // "k less than a number is n" => x - k = n
+      var n2 = xStar - k; return {text: cap(k+" less than a number is "+n2+"."), eq:{L:new Expr(1,-k),R:new Expr(0,n2)}};
+    } else if(type==='difference'){
+      // "The difference of a number and k is n" => x - k = n
+      var n3 = xStar - k; return {text: cap("The difference of a number and "+k+" is "+n3+"."), eq:{L:new Expr(1,-k),R:new Expr(0,n3)}};
+    } else {
+      // decreased by: "A number decreased by k is n" => x - k = n
+      var n4 = xStar - k; return {text: cap("A number decreased by "+k+" is "+n4+"."), eq:{L:new Expr(1,-k),R:new Expr(0,n4)}};
+    }
+  }
+  function genMultDiv(){
+    var xStar = sg()*ri(1,12); var a = sg()*ri(2,6);
+    var flavor = pick(['times','product','quotient']);
+    if(flavor==='times'){
+      var c = a*xStar; return {text: cap(a+" times a number is "+c+"."), eq:{L:new Expr(a,0),R:new Expr(0,c)}};
+    } else if(flavor==='product'){
+      var b=sg()*ri(1,10); var c2 = a*xStar + b; return {text: cap("The sum of "+a+" times a number and "+b+" is "+c2+"."), eq:{L:new Expr(a,b),R:new Expr(0,c2)}};
+    } else {
+      // quotient: "The quotient of a number and k is n" => (1/k)x = n
+      var k = ri(2,10)*sg(); var n = xStar/k; return {text: cap("The quotient of a number and "+k+" is "+n+"."), eq:{L:new Expr(1/k,0),R:new Expr(0,n)}};
+    }
+  }
+  function genFractions(){
+    var xStar = sg()*ri(1,12); var den = pick([2,3,4,5,6,8,10,12]); var num = sg()*ri(1,den-1); var a = num/den; var c = tidy(a*xStar);
+    return {text: cap(frac(num,den)+" of a number is "+c+"."), eq:{L:new Expr(a,0),R:new Expr(0,c)}};
+  }
+  function frac(n,d){ return (n<0?'-':'')+Math.abs(n)+"/"+Math.abs(d); }
+  function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+  function genByMode(mode){ if(mode==='addSub') return genAddSub(); if(mode==='multDiv') return genMultDiv(); if(mode==='fractions') return genFractions(); return [genAddSub,genMultDiv,genFractions][ri(0,2)](); }
+
+  // ----- UI state -----
+  var stmtEl = document.getElementById('stmt');
+  var eqInput = document.getElementById('eqInput');
+  var eqFeedback = document.getElementById('eqFeedback');
+  var solFeedback = document.getElementById('solFeedback');
+  var historyEl = document.getElementById('history');
+  var modeSel = document.getElementById('mode');
+  var diffSel = document.getElementById('difficulty');
+
+  var current = { text:'', eq:null, revealed:false, revealedSol:false };
+
+  function newStatement(){
+    var m = modeSel.value; var item = genByMode(m);
+    current.text = item.text; current.eq = item.eq; current.revealed=false; current.revealedSol=false;
+    stmtEl.textContent = item.text;
+    eqInput.value=''; eqFeedback.textContent=''; solFeedback.textContent='';
+  }
+
+  function checkTranslation(){
+    try{
+      var userEq = parseEquation(eqInput.value);
+      if(sameLinear(userEq, current.eq)){
+        eqFeedback.innerHTML = '<span class="good">? Correct translation.</span> '+
+          '<span class="mini">('+escapeHTML(eqToString(userEq))+')</span>';
+        pushHistory('Translated correctly: '+escapeHTML(eqToString(userEq)));
+      } else {
+        eqFeedback.innerHTML = '<span class="bad">? Not equivalent.</span> Try again or reveal the equation.';
+      }
+    }catch(e){ eqFeedback.innerHTML = '<span class="bad">Enter a valid equation containing =</span>'; }
+  }
+
+  function revealEquation(){ current.revealed=true; eqFeedback.innerHTML = 'Target equation: <code>'+escapeHTML(eqToString(current.eq))+'</code>'; pushHistory('Revealed equation.'); }
+
+  function checkSolution(){
+    try{
+      var userEq=parseEquation(eqInput.value); var S=solve(userEq);
+      if(S.kind!=='one'){ solFeedback.innerHTML = '<span class="bad">Cannot get a single solution from your equation.</span>'; return; }
+      var Strue = solve(current.eq);
+      if(Strue.kind==='one' && tidy(S.x)===tidy(Strue.x)){
+        solFeedback.innerHTML = '<span class="good">? Correct: x = '+S.x+'</span>';
+        pushHistory('Solved: x = '+S.x);
+      } else {
+        solFeedback.innerHTML = '<span class="bad">? Incorrect solution.</span> Try again or reveal solution.';
+      }
+    }catch(e){ solFeedback.innerHTML='<span class="bad">Enter a valid equation first (then a value for x).</span>'; }
+  }
+
+  function revealSolution(){ var S = solve(current.eq); if(S.kind==='one'){ solFeedback.innerHTML = 'Solution: <code>x = '+S.x+'</code>'; pushHistory('Revealed solution: x = '+S.x); } else if(S.kind==='identity'){ solFeedback.textContent='Identity: all real numbers'; } else { solFeedback.textContent='No solution'; } }
+
+  function pushHistory(text){ var li=document.createElement('li'); li.textContent = text; historyEl.appendChild(li); }
+  function escapeHTML(s){ return String(s).replace(/[&<>]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+
+  // ----- Save / Export -----
+  function snapshot(){ return { timestamp:new Date().toISOString(), mode:modeSel.value, difficulty:diffSel.value, statement:current.text, target:eqToString(current.eq), steps:Array.from(historyEl.querySelectorAll('li')).map(li=>li.textContent) }; }
+  function downloadFile(name, content, mime){ var blob=new Blob([content],{type:mime}); var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
+  function toTxt(data){ let L=[]; L.push('Translating Words ? Equations Ñ Report'); L.push('Date: '+new Date(data.timestamp).toLocaleString()); L.push('Mode: '+data.mode+' | Difficulty: '+data.difficulty); L.push('Statement: '+data.statement); L.push('Target: '+data.target); L.push(''); L.push('Progress:'); if(!data.steps.length) L.push('  (no steps yet)'); else data.steps.forEach((s,i)=>L.push('  '+(i+1)+'. '+s)); return L.join('\n'); }
+  function saveLocal(){ try{ localStorage.setItem('translating_session', JSON.stringify(snapshot())); eqFeedback.textContent='Saved to this browser.'; } catch(e){ eqFeedback.textContent='Save failed: '+e; } }
+  function loadLocal(){ try{ let raw=localStorage.getItem('translating_session'); if(!raw){ eqFeedback.textContent='No saved session.'; return; } let data=JSON.parse(raw); restore(data); eqFeedback.textContent='Loaded last session.'; } catch(e){ eqFeedback.textContent='Load failed: '+e; } }
+  function restore(data){ current.text=data.statement; stmtEl.textContent=data.statement; try{ var parts=data.target.split('='); current.eq={L:parseExpr(parts[0]), R:parseExpr(parts[1])}; }catch(e){} historyEl.innerHTML=''; (data.steps||[]).forEach(s=>pushHistory(s)); }
+  function openPrint(){ var data=snapshot(); var stepsHtml=(data.steps&&data.steps.length)? data.steps.map(s=>'<li>'+escapeHTML(s)+'</li>').join(''):'<li>(no steps yet)</li>'; var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Word?Equation Report</title><style>body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;margin:24px;color:#222}h1{font-size:20px;margin:0 0 8px}.muted{color:#555}.sec{margin-top:16px}ol{padding-left:20px}code{background:#f2f4f8;padding:2px 5px;border-radius:4px}</style></head><body>'+
+    '<h1>Translating Words ? Equations Ñ Report</h1>'+
+    '<div class="muted">Date: '+new Date(data.timestamp).toLocaleString()+'</div>'+
+    '<div class="muted">Mode: '+data.mode+' | Difficulty: '+data.difficulty+'</div>'+
+    '<div class="sec"><strong>Statement:</strong> '+escapeHTML(data.statement)+'</div>'+
+    '<div><strong>Target equation:</strong> <code>'+escapeHTML(data.target)+'</code></div>'+
+    '<div class="sec"><strong>Progress</strong></div>'+
+    '<ol>'+stepsHtml+'</ol>'+
+    '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script></body></html>';
+    var w=window.open('about:blank','_blank'); w.document.open(); w.document.write(html); w.document.close(); }
+
+  // ----- Buttons -----
+  document.getElementById('btnNew').addEventListener('click',newStatement);
+  document.getElementById('btnHint').addEventListener('click',function(){
+    eqFeedback.innerHTML = 'Hint: Identify operation words (e.g., <em>sum, more than, difference, product, of, quotient</em>). Beware that <strong>less than</strong> reverses order ("k less than x" ? <code>x - k</code>).';
+  });
+  document.getElementById('btnRevealEq').addEventListener('click',revealEquation);
+  document.getElementById('btnCheckEq').addEventListener('click',checkTranslation);
+  document.getElementById('btnClear').addEventListener('click',function(){ eqInput.value=''; eqFeedback.textContent=''; });
+  document.getElementById('btnCheckSol').addEventListener('click',checkSolution);
+  document.getElementById('btnRevealSol').addEventListener('click',revealSolution);
+
+  document.getElementById('btnSaveJSON').addEventListener('click',function(){ downloadFile('translating_session.json', JSON.stringify(snapshot(),null,2), 'application/json'); });
+  document.getElementById('btnExportTXT').addEventListener('click',function(){ downloadFile('translating_report.txt', toTxt(snapshot()), 'text/plain'); });
+  document.getElementById('btnExportPDF').addEventListener('click',openPrint);
+  document.getElementById('btnSaveLocal').addEventListener('click',saveLocal);
+  document.getElementById('btnLoadLocal').addEventListener('click',loadLocal);
+  document.getElementById('importJSON').addEventListener('change', function(ev){ var f=ev.target.files[0]; if(!f) return; var r=new FileReader(); r.onload=function(){ try{ restore(JSON.parse(r.result)); }catch(e){ eqFeedback.textContent='Import failed: '+e; } }; r.readAsText(f); ev.target.value=''; });
+
+  // initial
+  newStatement();
+})();
+</script>
+</body>
+</html>

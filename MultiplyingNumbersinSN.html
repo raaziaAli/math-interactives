@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scientific Notation: Drag & Drop (Superscripts with Dot)</title>
+<style>
+  body{font-family:Arial, Helvetica, sans-serif; margin:20px;}
+  h1{font-size:20px; margin:0 0 8px}
+  p{margin:6px 0 14px}
+  .wrap{display:grid; grid-template-columns: 1fr 1fr; gap:16px}
+  .card{border:1px solid #bbb; border-radius:8px; padding:12px}
+  .step{display:grid; grid-template-columns: 28px 1fr; gap:8px; align-items:center; margin:8px 0}
+  .expr{background:#f7f7f7; border:1px solid #ddd; border-radius:6px; padding:8px}
+  .drop{min-height:36px; border:2px dashed #bbb; border-radius:6px; padding:6px; display:flex; align-items:center}
+  .chip{display:inline-block; padding:8px 10px; border:1px solid #888; border-radius:16px; margin:6px; background:#fff; cursor:grab;}
+  .actions{margin-top:10px}
+  button{padding:8px 12px; margin-right:8px}
+  .ok{outline:2px solid #2e7d32}
+  .no{outline:2px solid #c62828}
+</style>
+</head>
+<body>
+  <h1>Match each step to the correct description</h1>
+  <p>We are multiplying <b>(2.4 * 10<sup>3</sup>) * (7.1 * 10<sup>3</sup>)</b>. Drag a description chip (A to F) onto each step.</p>
+
+  <div class="wrap">
+    <div class="card" id="steps">
+      <div class="step">
+        <div>0.</div>
+        <div>
+          <div class="expr">(2.4 * 10<sup>3</sup>) * (7.1 * 10<sup>3</sup>)</div>
+          <small>Original expression</small>
+        </div>
+      </div>
+      <div class="step" data-id="D">
+        <div>1.</div>
+        <div>
+          <div class="expr">= 2.4 * 7.1 * 10<sup>3</sup> * 10<sup>3</sup></div>
+          <div class="drop"></div>
+        </div>
+      </div>
+      <div class="step" data-id="F">
+        <div>2.</div>
+        <div>
+          <div class="expr">= (2.4 * 7.1) * (10<sup>3</sup> * 10<sup>3</sup>)</div>
+          <div class="drop"></div>
+        </div>
+      </div>
+      <div class="step" data-id="E">
+        <div>3.</div>
+        <div>
+          <div class="expr">= 17.04 * 10<sup>6</sup></div>
+          <div class="drop"></div>
+        </div>
+      </div>
+      <div class="step" data-id="C">
+        <div>4.</div>
+        <div>
+          <div class="expr">= 1.704 * 10<sup>1</sup> * 10<sup>6</sup></div>
+          <div class="drop"></div>
+        </div>
+      </div>
+      <div class="step" data-id="B">
+        <div>5.</div>
+        <div>
+          <div class="expr">= 1.704 * 10<sup>7</sup></div>
+          <div class="drop"></div>
+        </div>
+      </div>
+      <div class="step" data-id="A">
+        <div>6.</div>
+        <div>
+          <div class="expr">= 17,040,000</div>
+          <div class="drop"></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="check">Check</button>
+        <button id="reset">Reset</button>
+        <button id="reveal">Reveal</button>
+        <span id="score" style="margin-left:8px; font-weight:bold"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <p><b>Description bank</b>  drag to a step:</p>
+      <div id="bank">
+        <div class="chip" draggable="true" data-id="A">A. Write in standard form</div>
+        <div class="chip" draggable="true" data-id="B">B. Product of Powers Property</div>
+        <div class="chip" draggable="true" data-id="C">C. Write in scientific notation</div>
+        <div class="chip" draggable="true" data-id="D">D. Commutative Property of Multiplication</div>
+        <div class="chip" draggable="true" data-id="E">E. Simplify</div>
+        <div class="chip" draggable="true" data-id="F">F. Associative Property of Multiplication</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const bank = document.getElementById('bank');
+  const chips = Array.from(document.querySelectorAll('.chip'));
+  const drops = Array.from(document.querySelectorAll('.drop'));
+  let dragItem = null;
+
+  chips.forEach(c=>{
+    c.addEventListener('dragstart', e=>{ dragItem=c; });
+  });
+  drops.forEach(d=>{
+    d.addEventListener('dragover', e=>{ e.preventDefault(); d.style.borderColor='#555'; });
+    d.addEventListener('dragleave', ()=> d.style.borderColor='#bbb');
+    d.addEventListener('drop', ()=>{
+      d.style.borderColor='#bbb';
+      if(d.firstElementChild) bank.appendChild(d.firstElementChild);
+      d.appendChild(dragItem);
+      dragItem=null;
+    });
+  });
+
+  document.getElementById('reset').onclick = ()=>{
+    drops.forEach(d=>{ if(d.firstElementChild) bank.appendChild(d.firstElementChild); d.classList.remove('ok','no'); });
+    document.getElementById('score').textContent='';
+  }
+  document.getElementById('reveal').onclick = ()=>{
+    drops.forEach(d=>{ if(d.firstElementChild) bank.appendChild(d.firstElementChild); });
+    drops.forEach(d=>{
+      const need = d.parentElement.parentElement.getAttribute('data-id');
+      if(!need) return;
+      const chip = bank.querySelector(`.chip[data-id="${need}"]`);
+      if(chip) d.appendChild(chip);
+    });
+  }
+  document.getElementById('check').onclick = ()=>{
+    let correct=0, total=0;
+    drops.forEach(d=>{
+      const need = d.parentElement.parentElement.getAttribute('data-id');
+      if(!need) return; total++;
+      const got = d.firstElementChild?.getAttribute('data-id');
+      d.classList.remove('ok','no');
+      if(got===need){ correct++; d.classList.add('ok'); }
+      else d.classList.add('no');
+    });
+    document.getElementById('score').textContent = `${correct}/${total} correct`;
+  }
+</script>
+</body>
+</html>

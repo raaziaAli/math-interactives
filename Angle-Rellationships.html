@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transversal & Angle Relationships</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1b2e;--surface:#13243d;--surface2:#1a3050;--card:#1e3a5f;
+  --teal:#00d4aa;--blue:#4a9eff;--amber:#ffb347;--coral:#ff6b6b;
+  --purple:#c084fc;--green:#4ade80;--pink:#f472b6;
+  --text:#e8f4ff;--muted:#7a9cc0;--faint:#3a5878;--border:rgba(255,255,255,.08);
+}
+html{font-size:15px}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.header-brand{display:flex;align-items:center;gap:12px}
+.brand-icon{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--teal),var(--blue));display:flex;align-items:center;justify-content:center;font-size:20px}
+.brand-name{font-size:17px;font-weight:900;color:var(--text)}
+.brand-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.back-btn{padding:8px 18px;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:800;cursor:pointer;text-decoration:none;transition:all .15s}
+.back-btn:hover{border-color:var(--teal);color:var(--teal)}
+.app{display:grid;grid-template-columns:1fr 340px;flex:1}
+.canvas-col{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;gap:18px}
+.panel-col{background:var(--surface);border-left:1px solid var(--border);padding:22px 18px;display:flex;flex-direction:column;gap:16px;overflow-y:auto}
+.cv-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.3);width:100%;max-width:700px}
+#cv{display:block;width:100%;height:auto}
+.slider-row{display:flex;align-items:center;gap:14px;width:100%;max-width:700px}
+.slider-row label{font-size:12px;font-weight:800;color:var(--muted);white-space:nowrap;text-transform:uppercase;letter-spacing:.06em}
+.slider-row input[type=range]{flex:1;accent-color:var(--teal);cursor:pointer}
+.slider-val{font-size:16px;font-weight:900;color:var(--teal);min-width:44px;text-align:right}
+.toggle-row{display:flex;align-items:center;gap:10px;width:100%;max-width:700px}
+.toggle-row label{font-size:13px;font-weight:700;color:var(--muted);cursor:pointer}
+.toggle{width:44px;height:24px;border-radius:12px;background:var(--faint);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;border:none;padding:0}
+.toggle.on{background:var(--teal)}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s}
+.toggle.on::after{left:23px}
+.section-title{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.section-title::before{content:'';width:20px;height:2px;background:var(--teal);border-radius:1px}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cat-btn{padding:11px 8px;border-radius:12px;border:2px solid var(--border);background:rgba(255,255,255,.04);cursor:pointer;transition:all .2s;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:var(--muted);text-align:center;line-height:1.3}
+.cat-btn:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.cat-btn.active{color:#fff;border-color:transparent}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px}
+.info-type{font-size:13px;font-weight:900;color:var(--text);margin-bottom:4px}
+.info-pair{font-size:17px;font-weight:900;color:var(--teal);margin-bottom:8px}
+.info-rule{font-size:12px;color:var(--muted);line-height:1.65}
+.info-rule span{font-weight:800;color:var(--text)}
+.info-relation{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:6px 12px;border-radius:99px;font-size:11px;font-weight:800}
+.rel-equal{background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.2)}
+.rel-supp{background:rgba(255,179,71,.12);color:var(--amber);border:1px solid rgba(255,179,71,.2)}
+.nav-dots{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px}
+.ndot{width:8px;height:8px;border-radius:50%;background:var(--faint);cursor:pointer;transition:all .2s}
+.ndot.active{background:var(--teal);transform:scale(1.3)}
+.prev-next{display:flex;gap:8px;justify-content:center}
+.pn-btn{padding:9px 20px;border-radius:99px;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);color:var(--text);font-size:13px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .15s}
+.pn-btn:hover{border-color:var(--teal);color:var(--teal);background:rgba(0,212,170,.1)}
+.angle-ref{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px}
+.ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.ref-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted)}
+.ref-dot{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff;flex-shrink:0}
+@media(max-width:900px){.app{grid-template-columns:1fr}.panel-col{border-left:none;border-top:1px solid var(--border)}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-brand">
+    <div class="brand-icon">📐</div>
+    <div>
+      <div class="brand-name">Transversal & Angle Relationships</div>
+      <div class="brand-sub">Parallel lines cut by a transversal · Grade 8 · 8.G</div>
+    </div>
+  </div>
+  <a class="back-btn" href="index.html">← Back to portal</a>
+</div>
+
+<div class="app">
+  <div class="canvas-col">
+    <canvas id="cv" width="700" height="420"></canvas>
+    <div class="slider-row">
+      <label>Transversal angle</label>
+      <input type="range" id="angleSlider" min="20" max="70" value="40" oninput="setAngle(this.value)">
+      <span class="slider-val" id="angleVal">40°</span>
+    </div>
+    <div class="toggle-row">
+      <button class="toggle on" id="parallelToggle" onclick="toggleParallel()"></button>
+      <label onclick="toggleParallel()">Lines are parallel — toggle off to see when properties break</label>
+    </div>
+  </div>
+
+  <div class="panel-col">
+    <div>
+      <div class="section-title">Angle Pair Category</div>
+      <div class="cat-grid">
+        <button class="cat-btn" id="btn-vertical"     onclick="selectCat('vertical')">    <div style="font-size:16px;margin-bottom:3px">✕</div>Vertical Angles</button>
+        <button class="cat-btn" id="btn-corresponding" onclick="selectCat('corresponding')"><div style="font-size:16px;margin-bottom:3px">⟹</div>Corresponding</button>
+        <button class="cat-btn" id="btn-altInterior"  onclick="selectCat('altInterior')"> <div style="font-size:16px;margin-bottom:3px">↔</div>Alt. Interior</button>
+        <button class="cat-btn" id="btn-altExterior"  onclick="selectCat('altExterior')"> <div style="font-size:16px;margin-bottom:3px">↔</div>Alt. Exterior</button>
+        <button class="cat-btn" id="btn-coInterior"   onclick="selectCat('coInterior')">  <div style="font-size:16px;margin-bottom:3px">∥</div>Co-interior</button>
+        <button class="cat-btn" id="btn-clear" onclick="clearCat()" style="background:rgba(255,82,82,.08);border-color:rgba(255,82,82,.2);color:#ff8888"><div style="font-size:16px;margin-bottom:3px">✕</div>Clear</button>
+      </div>
+    </div>
+
+    <div class="info-card" id="info-card">
+      <div class="info-type" id="info-type">Select a category</div>
+      <div class="info-pair" id="info-pair">—</div>
+      <div class="info-rule" id="info-rule">Click any category above to highlight that angle pair on the diagram.</div>
+    </div>
+
+    <div id="nav-area" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:12px 14px">
+        <button class="pn-btn" onclick="prevPair()">← Prev</button>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1">
+          <div id="pair-counter" style="font-size:12px;font-weight:800;color:var(--muted)">Pair 1 of 4</div>
+          <div class="nav-dots" id="nav-dots"></div>
+        </div>
+        <button class="pn-btn" onclick="nextPair()">Next →</button>
+      </div>
+    </div>
+
+    <div class="angle-ref">
+      <div class="section-title">Angle Reference</div>
+      <div style="font-size:11px;color:var(--faint);margin-bottom:8px">Numbered clockwise from top-right at each intersection</div>
+      <div class="ref-grid" id="ref-grid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  GEOMETRY MODEL
+//
+//  Two horizontal parallel lines L1 (top) and L2 (bottom).
+//  A transversal crosses both at angle θ from vertical.
+//
+//  At each intersection, 4 angles are formed.
+//  We number them CLOCKWISE from the top-right sector:
+//
+//  Top intersection (T0):
+//    ∠1 = top-right   (above L1, right of transversal)
+//    ∠2 = bottom-right (below L1, right of transversal)
+//    ∠3 = bottom-left  (below L1, left of transversal)
+//    ∠4 = top-left    (above L1, left of transversal)
+//
+//  Bottom intersection (T1):
+//    ∠5 = top-right   (above L2, right of transversal)
+//    ∠6 = bottom-right (below L2, right of transversal)
+//    ∠7 = bottom-left  (below L2, left of transversal)
+//    ∠8 = top-left    (above L2, left of transversal)
+//
+//  With θ = transversal angle from vertical (slider):
+//    transversal direction = angle φ from horizontal
+//    where φ = 90° - θ  (so at θ=40°, φ=50° from horizontal)
+//
+//  The transversal makes angle φ with the horizontal lines.
+//  At T0, the four sectors have these angular spans:
+//    ∠1 (top-right): from 0 to φ           → acute, right of trans, above L1
+//    ∠2 (bot-right): from -φ to 0 (= 360-φ to 360)  → acute, right of trans, below L1
+//    ∠3 (bot-left):  from 180 to 180+φ     → = ∠1 (vertical pair)
+//    ∠4 (top-left):  from 180-φ to 180     → = ∠2 (vertical pair)
+//
+//  Note: canvas 0° = rightward, angles go CLOCKWISE (y-down).
+//
+//  ANGLE RELATIONSHIPS (standard):
+//    Vertical:     ∠1=∠3, ∠2=∠4 at T0;  ∠5=∠7, ∠6=∠8 at T1
+//    Corresponding: ∠1=∠5, ∠2=∠6, ∠3=∠7, ∠4=∠8  (same position)
+//    Alt Interior:  ∠3=∠5, ∠4=∠6  (between lines, opposite sides) 
+//    Alt Exterior:  ∠1=∠7, ∠2=∠8  (outside lines, opposite sides)  WAIT —
+//      Actually with our numbering: ∠2&∠8 are both right-side,
+//      alt exterior should be opposite sides: ∠1 (top,right) & ∠7 (bot,left) ✓
+//                                             ∠4 (top,left)  & ∠6 (bot,right) ✓
+//    Co-interior:   ∠3+∠6=180°, ∠4+∠5=180°  (same side, between lines)
+//                   Wait: ∠4 is top-LEFT (above L1, left),  ∠5 is top-RIGHT (above L2, right)
+//                   These are NOT between the lines.
+//                   Between lines = below L1 and above L2:
+//                   ∠2 (below L1, right), ∠3 (below L1, left)
+//                   ∠5 (above L2, right), ∠8 (above L2, left)  -- wait ∠8=top-left = ABOVE L2 ✓
+//                   Wait let me recheck ∠8: bottom intersection, top-left = above L2 on LEFT side ✓
+//                   Co-interior same side (right): ∠2 + ∠5 = 180°
+//                   Co-interior same side (left):  ∠3 + ∠8 = 180°   -- hmm
+//                   Standard textbook: co-interior = ∠4+∠6 and ∠3+∠5? No.
+//                   Let me use the standard: angles between the lines on SAME side.
+//                   Between = below L1 and above L2.
+//                   Right side of transversal: ∠2 (below L1, right) + ∠5 (above L2, right)
+//                   Left side of transversal:  ∠3 (below L1, left)  + ∠8 (above L2, left) -- ∠8=top-left at T1 = above L2 left ✓
+//
+// ═══════════════════════════════════════════════════════
+
+const cv  = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const W = 700, H = 420;
+
+let angle      = 40;   // slider: degrees transversal makes with vertical
+let isParallel = true;
+let activeCat  = null;
+let pairIndex  = 0;
+
+// ── Angle pair definitions ─────────────────────────────
+// Each angle is tagged with: which intersection (0=top,1=bottom)
+// and which quadrant at that intersection.
+// Quadrants defined by the two lines (horizontal + transversal):
+//   'TR' = top-right   = above horizontal, right of transversal
+//   'BR' = bottom-right= below horizontal, right of transversal
+//   'BL' = bottom-left = below horizontal, left of transversal
+//   'TL' = top-left    = above horizontal, left of transversal
+
+// Standard numbering (clockwise from top-right):
+// T0: ∠1=TR, ∠2=BR, ∠3=BL, ∠4=TL
+// T1: ∠5=TR, ∠6=BR, ∠7=BL, ∠8=TL
+
+const ANGLE_SECTORS = {
+  '∠1':{t:0, q:'TR'}, '∠2':{t:0, q:'BR'}, '∠3':{t:0, q:'BL'}, '∠4':{t:0, q:'TL'},
+  '∠5':{t:1, q:'TR'}, '∠6':{t:1, q:'BR'}, '∠7':{t:1, q:'BL'}, '∠8':{t:1, q:'TL'},
+};
+
+const CAT_COLORS = {
+  vertical:'#c084fc', corresponding:'#4a9eff',
+  altInterior:'#00d4aa', altExterior:'#ffb347', coInterior:'#f472b6',
+};
+
+const CAT_INFO = {
+  vertical: {
+    name:'Vertical Angles',
+    rule:'Vertical angles are the <span>opposite angles</span> formed when two lines intersect. They are <span>always equal</span> — this holds whether lines are parallel or not.',
+    relation:'equal',
+    // At T0: ∠1 (TR) ↔ ∠3 (BL), ∠2 (BR) ↔ ∠4 (TL)
+    // At T1: ∠5 (TR) ↔ ∠7 (BL), ∠6 (BR) ↔ ∠8 (TL)
+    pairs:[['∠1','∠3'],['∠2','∠4'],['∠5','∠7'],['∠6','∠8']]
+  },
+  corresponding: {
+    name:'Corresponding Angles',
+    rule:'Corresponding angles are in the <span>same position</span> at each intersection — both top-right, both bottom-left, etc. When lines are parallel, they are <span>equal</span>.',
+    relation:'equal',
+    // Same quadrant at T0 and T1: ∠1↔∠5 (TR), ∠2↔∠6 (BR), ∠3↔∠7 (BL), ∠4↔∠8 (TL)
+    pairs:[['∠1','∠5'],['∠2','∠6'],['∠3','∠7'],['∠4','∠8']]
+  },
+  altInterior: {
+    name:'Alternate Interior Angles',
+    rule:'Alternate interior angles are <span>between the two lines</span>, on <span>opposite sides</span> of the transversal. When lines are parallel, they are <span>equal</span>.',
+    relation:'equal',
+    // Between the lines = below L1 and above L2
+    // Below L1: ∠2 (BR at T0), ∠3 (BL at T0)
+    // Above L2: ∠5 (TR at T1), ∠8 (TL at T1)
+    // Opposite sides: ∠3 (left at T0) ↔ ∠5 (right at T1), ∠2 (right at T0) ↔ ∠8 (left at T1)
+    pairs:[['∠3','∠5'],['∠2','∠8']]
+  },
+  altExterior: {
+    name:'Alternate Exterior Angles',
+    rule:'Alternate exterior angles are <span>outside both lines</span>, on <span>opposite sides</span> of the transversal. When lines are parallel, they are <span>equal</span>.',
+    relation:'equal',
+    // Outside = above L1 and below L2
+    // Above L1: ∠1 (TR at T0), ∠4 (TL at T0)
+    // Below L2: ∠6 (BR at T1), ∠7 (BL at T1)
+    // Opposite sides: ∠1 (right at T0) ↔ ∠7 (left at T1), ∠4 (left at T0) ↔ ∠6 (right at T1)
+    pairs:[['∠1','∠7'],['∠4','∠6']]
+  },
+  coInterior: {
+    name:'Co-interior (Same-side Interior)',
+    rule:'Co-interior angles are <span>between the two lines</span>, on the <span>same side</span> of the transversal. When lines are parallel, they are <span>supplementary (sum to 180°)</span>.',
+    relation:'supp',
+    // Same side between lines:
+    // Right side: ∠2 (BR at T0, below L1 right) + ∠5 (TR at T1, above L2 right) = 180°
+    // Left side:  ∠3 (BL at T0, below L1 left)  + ∠8 (TL at T1, above L2 left)  = 180°
+    pairs:[['∠2','∠5'],['∠3','∠8']]
+  },
+};
+
+// ── Controls ───────────────────────────────────────────
+function setAngle(v) {
+  angle = parseFloat(v);
+  document.getElementById('angleVal').textContent = v + '°';
+  draw();
+}
+function toggleParallel() {
+  isParallel = !isParallel;
+  document.getElementById('parallelToggle').classList.toggle('on', isParallel);
+  draw();
+}
+
+// ── Geometry ───────────────────────────────────────────
+// angle = degrees the transversal makes with the VERTICAL (slider value).
+// φ = angle from HORIZONTAL = 90 - angle.
+// In canvas coords (y-down, 0=right, CW positive):
+//   transversal going down-right has canvas angle = (90 - angle) degrees = φ degrees
+//   i.e. transRad = φ * π/180 = (90-angle) * π/180
+
+function getGeo() {
+  const L1y = 130, L2y = 300;
+  const T0x = 280;
+  // φ = angle transversal makes with horizontal (acute, > 0)
+  const phi = (90 - angle) * Math.PI / 180;  // radians from horizontal
+  // transversal direction vector (going down-right): dx=cos(phi), dy=sin(phi)
+  // from T0, going down to T1:
+  const dist = L2y - L1y;  // vertical distance between lines
+  const T1x = isParallel
+    ? T0x + dist / Math.tan(phi) * 0  // for parallel: T1 is directly below adjusted
+    : T0x;
+  // Actually for parallel lines, transversal hits L2 at:
+  // T1x = T0x + (L2y - L1y) * cos(phi) / sin(phi) = T0x + dist * cos(phi)/sin(phi)
+  const T1xP = T0x + dist * Math.cos(phi) / Math.sin(phi);
+  const T1 = { x: isParallel ? T1xP : T1xP * 0.92 + T0x * 0.08, y: L2y };
+  return {
+    L1y, L2y,
+    T0: { x: T0x, y: L1y },
+    T1,
+    phi,   // transversal angle from horizontal (radians)
+  };
+}
+
+// ── Draw sector for one angle ──────────────────────────
+// The transversal makes angle phi with the horizontal line.
+// At any intersection, the four quadrants are:
+//   TR: above horizontal, right of transversal
+//   BR: below horizontal, right of transversal
+//   BL: below horizontal, left of transversal
+//   TL: above horizontal, left of transversal
+//
+// In canvas angles (0=right, clockwise positive):
+//   The horizontal line goes along 0° (right) and 180° (left).
+//   The transversal going down-right is at angle +phi (below the horizontal on the right).
+//   The transversal going up-left is at angle phi+π.
+//
+//   TR sector: from -phi (up-right direction of transversal) to 0 (right along L)
+//              Wait - let's think carefully.
+//   
+//   The two lines divide the plane into 4 sectors:
+//   - Between angle 0 (rightward) and +phi (transversal going down-right): this is BR
+//   - Between +phi and π (leftward): this is BL
+//   - Between π and π+phi: this is TL  
+//   - Between π+phi (=-(π-phi)=transversal going up-left) and 2π (=0): this is TR
+//
+//   So in canvas angles:
+//   BR: start=0,       end=phi         (clockwise, below-right)
+//   BL: start=phi,     end=π           (clockwise, below-left)
+//   TL: start=π,       end=π+phi       (clockwise, top-left)
+//   TR: start=π+phi,   end=2π(=0)      (clockwise, top-right)
+
+function drawSector(cx, cy, q, phi, color, r) {
+  let startA, endA;
+  if      (q === 'BR') { startA = 0;       endA = phi;     }
+  else if (q === 'BL') { startA = phi;     endA = Math.PI; }
+  else if (q === 'TL') { startA = Math.PI; endA = Math.PI + phi; }
+  else                 { startA = Math.PI + phi; endA = 2*Math.PI; } // TR
+
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.arc(cx, cy, r, startA, endA, false); // false = clockwise
+  ctx.closePath();
+  ctx.fillStyle  = color + '40';
+  ctx.fill();
+  ctx.strokeStyle= color + 'aa';
+  ctx.lineWidth  = 1.5;
+  ctx.stroke();
+}
+
+// ── Draw angle number label ────────────────────────────
+function drawLabel(cx, cy, q, phi, num, highlighted) {
+  const r = 42;
+  let midA;
+  if      (q === 'BR') midA = phi / 2;
+  else if (q === 'BL') midA = (phi + Math.PI) / 2;
+  else if (q === 'TL') midA = Math.PI + phi / 2;
+  else                 midA = Math.PI + phi + (Math.PI - phi) / 2;
+  if (q === 'TR') midA = Math.PI + phi + (Math.PI - phi) / 2;
+
+  const lx = cx + Math.cos(midA) * r;
+  const ly = cy + Math.sin(midA) * r;
+
+  ctx.fillStyle    = highlighted ? '#ffffff' : 'rgba(255,255,255,.45)';
+  ctx.font         = highlighted ? 'bold 14px Nunito,sans-serif' : '11px Nunito,sans-serif';
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(num, lx, ly);
+
+  // For highlighted angles: show the degree value outside the arc
+  if (highlighted) {
+    const phDeg  = Math.round(phi * 180 / Math.PI);
+    const suppDeg = 180 - phDeg;
+    // TR and BL are the acute angle (= phi degrees from horizontal)
+    // BR and TL are the obtuse/supplementary angle
+    const deg = (q === 'TR' || q === 'BL') ? phDeg : suppDeg;
+    const col = activeCat ? CAT_COLORS[activeCat] : '#fff';
+    ctx.fillStyle    = col;
+    ctx.font         = 'bold 12px Nunito,sans-serif';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(deg + '°', cx + Math.cos(midA)*(r+24), cy + Math.sin(midA)*(r+24));
+  }
+}
+
+// ── Main draw ──────────────────────────────────────────
+function draw() {
+  const { L1y, L2y, T0, T1, phi } = getGeo();
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#0d1b2e';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid dots
+  ctx.fillStyle = 'rgba(255,255,255,.03)';
+  for (let x=40;x<W;x+=40) for (let y=30;y<H;y+=40) {
+    ctx.beginPath(); ctx.arc(x,y,1.5,0,Math.PI*2); ctx.fill();
+  }
+
+  // ── Draw highlighted sectors (behind lines) ──────────
+  if (activeCat) {
+    const pair  = CAT_INFO[activeCat].pairs[pairIndex];
+    const color = CAT_COLORS[activeCat];
+    pair.forEach(angName => {
+      const info   = ANGLE_SECTORS[angName];
+      const center = info.t === 0 ? T0 : T1;
+      drawSector(center.x, center.y, info.q, phi, color, 56);
+    });
+  }
+
+  // ── Parallel lines ────────────────────────────────────
+  const ext = 220;
+  ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.setLineDash([]);
+
+  ctx.strokeStyle = 'rgba(100,160,255,.7)';
+  ctx.beginPath(); ctx.moveTo(T0.x - ext, L1y); ctx.lineTo(T0.x + ext, L1y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(T1.x - ext, L2y); ctx.lineTo(T1.x + ext, L2y); ctx.stroke();
+
+  // Parallel tick marks
+  if (isParallel) {
+    drawTick(T0.x - 70, L1y);
+    drawTick(T1.x - 70, L2y);
+  }
+
+  // Line labels
+  ctx.fillStyle = 'rgba(100,160,255,.75)';
+  ctx.font = 'bold 14px Nunito,sans-serif';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText('L₁', T0.x + ext + 6, L1y);
+  ctx.fillText('L₂', T1.x + ext + 6, L2y);
+
+  // ── Transversal ───────────────────────────────────────
+  // direction: cos(phi) rightward, sin(phi) downward
+  const tx = Math.cos(phi), ty = Math.sin(phi);
+  const extT = 90;
+  ctx.strokeStyle = '#ff9f43';
+  ctx.lineWidth   = 2.5;
+  ctx.beginPath();
+  // Extend beyond T0 upward
+  ctx.moveTo(T0.x - tx * extT, T0.y - ty * extT);
+  // Extend beyond T1 downward
+  ctx.lineTo(T1.x + tx * extT, T1.y + ty * extT);
+  ctx.stroke();
+
+  // Transversal label 't'
+  ctx.fillStyle = 'rgba(255,159,67,.8)';
+  ctx.font = 'bold 14px Nunito,sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('t', T0.x - tx*(extT+10), T0.y - ty*(extT+10));
+
+  // Not-parallel indicator
+  if (!isParallel) {
+    ctx.strokeStyle='rgba(255,100,100,.4)'; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(T1.x + ext, L2y); ctx.lineTo(T0.x + ext + 40, L1y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,100,100,.6)'; ctx.font='11px Nunito,sans-serif'; ctx.textAlign='right';
+    ctx.fillText('not parallel', T0.x + ext + 38, L1y - 8);
+  }
+
+  // ── Angle number labels ───────────────────────────────
+  const quadsT0 = [
+    {q:'TR',n:'1'}, {q:'BR',n:'2'}, {q:'BL',n:'3'}, {q:'TL',n:'4'}
+  ];
+  const quadsT1 = [
+    {q:'TR',n:'5'}, {q:'BR',n:'6'}, {q:'BL',n:'7'}, {q:'TL',n:'8'}
+  ];
+
+  quadsT0.forEach(({q,n}) => {
+    const highlighted = activeCat && CAT_INFO[activeCat].pairs[pairIndex].includes('∠'+n);
+    drawLabel(T0.x, T0.y, q, phi, n, highlighted);
+  });
+  quadsT1.forEach(({q,n}) => {
+    const highlighted = activeCat && CAT_INFO[activeCat].pairs[pairIndex].includes('∠'+n);
+    drawLabel(T1.x, T1.y, q, phi, n, highlighted);
+  });
+
+  // Intersection dots
+  ctx.fillStyle = 'rgba(255,255,255,.35)';
+  [T0, T1].forEach(p => {
+    ctx.beginPath(); ctx.arc(p.x, p.y, 3.5, 0, Math.PI*2); ctx.fill();
+  });
+
+  updateAngleRef();
+  updateInfoCard();
+}
+
+function drawTick(x, y) {
+  ctx.strokeStyle = 'rgba(100,160,255,.6)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x-5, y-6); ctx.lineTo(x+5, y);
+  ctx.moveTo(x-5, y);   ctx.lineTo(x+5, y+6);
+  ctx.stroke();
+}
+
+// ── Sidebar updates ────────────────────────────────────
+function updateAngleRef() {
+  const { phi } = getGeo();
+  const phiDeg = Math.round(phi * 180 / Math.PI);
+  const suppDeg = 180 - phiDeg;
+
+  const refGrid = document.getElementById('ref-grid');
+  const pairs  = activeCat ? CAT_INFO[activeCat].pairs[pairIndex] : [];
+
+  const items = [
+    {n:'1', loc:'above L₁, right', size: phiDeg+'°', color:'#c084fc'},
+    {n:'2', loc:'below L₁, right', size: suppDeg+'°', color:'#4a9eff'},
+    {n:'3', loc:'below L₁, left',  size: phiDeg+'°', color:'#4a9eff'},
+    {n:'4', loc:'above L₁, left',  size: suppDeg+'°', color:'#c084fc'},
+    {n:'5', loc:'above L₂, right', size: phiDeg+'°', color:'#00d4aa'},
+    {n:'6', loc:'below L₂, right', size: suppDeg+'°', color:'#ffb347'},
+    {n:'7', loc:'below L₂, left',  size: phiDeg+'°', color:'#ffb347'},
+    {n:'8', loc:'above L₂, left',  size: suppDeg+'°', color:'#00d4aa'},
+  ];
+
+  refGrid.innerHTML = items.map(it => {
+    const hi = pairs.includes('∠'+it.n);
+    return `<div class="ref-item" style="${hi?'color:var(--text);font-weight:900':''}">
+      <div class="ref-dot" style="background:${it.color}${hi?'':'66'}">∠${it.n}</div>
+      <span>${it.size} · ${it.loc}</span>
+    </div>`;
+  }).join('');
+}
+
+function updateInfoCard() {
+  if (!activeCat) {
+    document.getElementById('info-type').textContent = 'Select a category';
+    document.getElementById('info-pair').textContent = '—';
+    document.getElementById('info-rule').innerHTML   = 'Click any category above to highlight that angle pair on the diagram.';
+    document.getElementById('info-card').style.borderColor = 'var(--border)';
+    const old = document.querySelector('.info-relation');
+    if (old) old.remove();
+    return;
+  }
+  const info  = CAT_INFO[activeCat];
+  const pair  = info.pairs[pairIndex];
+  const col   = CAT_COLORS[activeCat];
+  const { phi } = getGeo();
+  const phiDeg  = Math.round(phi * 180 / Math.PI);
+  const suppDeg = 180 - phiDeg;
+  const valText = info.relation === 'equal'
+    ? `both = ${phiDeg}°`
+    : `${phiDeg}° + ${suppDeg}° = 180°`;
+
+  document.getElementById('info-type').textContent = info.name;
+  document.getElementById('info-pair').innerHTML =
+    `<span style="color:${col}">${pair[0]} and ${pair[1]}</span> — ${isParallel ? valText : '(lines not parallel)'}`;
+  document.getElementById('info-rule').innerHTML = info.rule;
+  document.getElementById('info-card').style.borderColor = col;
+
+  const old = document.querySelector('.info-relation');
+  if (old) old.remove();
+  const badge = document.createElement('div');
+  badge.className = `info-relation ${info.relation==='equal' ? 'rel-equal' : 'rel-supp'}`;
+  badge.textContent = info.relation==='equal'
+    ? '✓ Equal when lines are parallel'
+    : '✓ Sum to 180° when lines are parallel';
+  document.getElementById('info-card').appendChild(badge);
+}
+
+// ── Category controls ──────────────────────────────────
+function selectCat(cat) {
+  activeCat = cat; pairIndex = 0;
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.background = ''; b.style.borderColor = ''; b.style.color = '';
+  });
+  const btn = document.getElementById('btn-' + cat);
+  if (btn) {
+    btn.classList.add('active');
+    btn.style.background   = CAT_COLORS[cat] + '22';
+    btn.style.borderColor  = CAT_COLORS[cat];
+    btn.style.color        = CAT_COLORS[cat];
+  }
+  updateNavDots(); draw();
+}
+
+function clearCat() {
+  activeCat = null; pairIndex = 0;
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.background = ''; b.style.borderColor = ''; b.style.color = '';
+  });
+  document.getElementById('nav-area').style.display = 'none';
+  draw();
+}
+
+function updateNavDots() {
+  if (!activeCat) { document.getElementById('nav-area').style.display='none'; return; }
+  const pairs = CAT_INFO[activeCat].pairs;
+  document.getElementById('nav-area').style.display = 'block';
+  document.getElementById('nav-dots').innerHTML = pairs.map((_,i) =>
+    `<div class="ndot ${i===pairIndex?'active':''}" onclick="goToPair(${i})"></div>`
+  ).join('');
+  const col = CAT_COLORS[activeCat];
+  document.getElementById('pair-counter').textContent = `Pair ${pairIndex+1} of ${pairs.length}`;
+  document.getElementById('pair-counter').style.color = col;
+}
+
+function goToPair(i) { pairIndex=i; updateNavDots(); draw(); }
+function nextPair() { if(!activeCat)return; pairIndex=(pairIndex+1)%CAT_INFO[activeCat].pairs.length; updateNavDots(); draw(); }
+function prevPair() { if(!activeCat)return; pairIndex=(pairIndex-1+CAT_INFO[activeCat].pairs.length)%CAT_INFO[activeCat].pairs.length; updateNavDots(); draw(); }
+
+draw();
+</script>
+</body>
+</html>

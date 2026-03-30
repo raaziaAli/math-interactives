@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Triangle Angle Sum – Drag & Rotate (Fixed Arcs)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 20px;
+      line-height: 1.6;
+    }
+    h1 {
+      text-align: center;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: space-around;
+      margin-top: 20px;
+    }
+    .box {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+      width: 340px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    }
+    .box h2 {
+      text-align: center;
+      margin-top: 0;
+    }
+    svg {
+      display: block;
+      margin: 0 auto;
+      background: #fafafa;
+    }
+    /* Draggable + rotatable styling */
+    .draggable, .rotate-handle {
+      cursor: pointer;
+    }
+    .rotate-handle {
+      fill: #444;
+    }
+    .rotate-handle:hover {
+      fill: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>Triangle Angle Sum – Drag & Rotate (Fixed Arcs)</h1>
+  <p style="max-width:800px; margin:auto;">
+    In Step 1, a non‐right triangle has angles A, B, and C inside the polygon. In Step 2,
+    each angle wedge (vertex + rays) can be <strong>dragged</strong> by clicking the
+    colored area and <strong>rotated</strong> by dragging the small black circle handle.
+    In Step 3, drop the wedges onto the line to show that 50° + 60° + 70° = 180°.
+  </p>
+
+  <div class="container">
+    <!-- STEP 1: Triangle ABC with arcs inside -->
+    <div class="box">
+      <h2>Step 1: Triangle ABC</h2>
+      <svg width="320" height="320">
+        <!-- A simple acute triangle: A=(80,250), B=(280,250), C=(180,100) -->
+        <polygon points="80,250 280,250 180,100" fill="none" stroke="black" stroke-width="2"/>
+        <!-- Label vertices -->
+        <text x="70" y="260" font-size="16">A</text>
+        <text x="270" y="260" font-size="16">B</text>
+        <text x="185" y="95" font-size="16">C</text>
+
+        <!-- Angle A ~ 50°, drawn inside the polygon -->
+        <g transform="translate(80,250)">
+          <!-- Ray 1: horizontal to the right (AB), Ray 2: angled up (AC) -->
+          <!-- Arc from (30,0) to roughly (16,-25) to create an inside wedge -->
+          <path d="M0,0 L30,0 A30,30 0 0,1 16,-25 Z"
+                fill="rgba(255,0,0,0.3)" stroke="red" stroke-width="2"/>
+          <text x="35" y="-5" fill="red" font-size="14">50°</text>
+        </g>
+
+        <!-- Angle B ~ 60°, drawn inside the polygon -->
+        <g transform="translate(280,250)">
+          <!-- Ray 1: horizontal to the left (BA), Ray 2: angled up-left (BC) -->
+          <!-- Arc from (0,0)->(-30,0)->(-25,-25) for an inside wedge -->
+          <path d="M0,0 L-30,0 A30,30 0 0,1 -25,-25 Z"
+                fill="rgba(0,255,0,0.3)" stroke="green" stroke-width="2"/>
+          <text x="-40" y="-5" fill="green" font-size="14">60°</text>
+        </g>
+
+        <!-- Angle C ~ 70°, drawn inside the polygon -->
+        <g transform="translate(180,100)">
+          <!-- Ray 1: angled down-right (CB), Ray 2: angled down-left (CA) -->
+          <!-- Arc from (30,0)->(10,25) for an inside wedge -->
+          <path d="M0,0 L30,0 A30,30 0 0,1 10,25 Z"
+                fill="rgba(0,0,255,0.3)" stroke="blue" stroke-width="2"/>
+          <text x="35" y="15" fill="blue" font-size="14">70°</text>
+        </g>
+      </svg>
+      <p>Triangle with angles ~50°, ~60°, ~70° (all inside).</p>
+    </div>
+
+    <!-- STEP 2: Draggable + Rotatable Wedges -->
+    <div class="box">
+      <h2>Step 2: Cut-Out Angles</h2>
+      <svg id="anglesSVG" width="320" height="220">
+        <!-- Angle A wedge (~50°) -->
+        <g id="angleA" class="draggable" transform="translate(60,110)">
+          <path d="M0,0 L30,0 A30,30 0 0,1 16,-25 Z"
+                fill="rgba(255,0,0,0.3)" stroke="red" stroke-width="2"/>
+          <!-- Rotation handle -->
+          <circle class="rotate-handle" cx="15" cy="-15" r="4"/>
+          <text x="35" y="-5" fill="red" font-size="14">50°</text>
+        </g>
+
+        <!-- Angle B wedge (~60°) -->
+        <g id="angleB" class="draggable" transform="translate(140,110)">
+          <path d="M0,0 L-30,0 A30,30 0 0,1 -25,-25 Z"
+                fill="rgba(0,255,0,0.3)" stroke="green" stroke-width="2"/>
+          <circle class="rotate-handle" cx="-20" cy="-15" r="4"/>
+          <text x="-40" y="-5" fill="green" font-size="14">60°</text>
+        </g>
+
+        <!-- Angle C wedge (~70°) -->
+        <g id="angleC" class="draggable" transform="translate(220,110)">
+          <path d="M0,0 L30,0 A30,30 0 0,1 10,25 Z"
+                fill="rgba(0,0,255,0.3)" stroke="blue" stroke-width="2"/>
+          <circle class="rotate-handle" cx="15" cy="15" r="4"/>
+          <text x="35" y="15" fill="blue" font-size="14">70°</text>
+        </g>
+      </svg>
+      <p>Drag by the colored area; rotate by dragging the black circle.</p>
+    </div>
+
+    <!-- STEP 3: Straight Line Drop Zone -->
+    <div class="box">
+      <h2>Step 3: Arrange on a Straight Line</h2>
+      <svg id="lineSVG" width="320" height="220">
+        <line x1="20" y1="110" x2="300" y2="110" stroke="black" stroke-width="2"/>
+        <text x="160" y="135" text-anchor="middle" font-size="14" fill="purple">
+          Drop angles here (180°)
+        </text>
+      </svg>
+      <p>Align them side by side to see 180°.</p>
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================
+       Draggable + Rotatable Logic
+    ====================================================== */
+    let selectedElement = null;
+    let currentMode = null; // 'drag' or 'rotate'
+    let offset = { x: 0, y: 0 };  // for drag
+    let startAngle = 0;          // for rotation
+    let startRotation = 0;       // initial rotation of the element
+
+    // Attach event listeners to all wedges
+    document.querySelectorAll('.draggable').forEach(el => {
+      el.addEventListener('mousedown', evt => {
+        // Check if we clicked on the rotate-handle or the wedge
+        if (evt.target.classList.contains('rotate-handle')) {
+          startRotate(evt, el);
+        } else {
+          startDrag(evt, el);
+        }
+      });
+    });
+
+    function startDrag(evt, element) {
+      evt.preventDefault();
+      selectedElement = element;
+      currentMode = 'drag';
+      let svg = element.ownerSVGElement;
+      let mousePos = getMousePosition(evt, svg);
+
+      // Parse existing translate(...)
+      let transform = element.getAttribute('transform') || "";
+      let translateMatch = /translate\(([^)]+)\)/.exec(transform);
+      let currentX = 0, currentY = 0;
+      if (translateMatch) {
+        let coords = translateMatch[1].split(',');
+        currentX = parseFloat(coords[0]);
+        currentY = parseFloat(coords[1]);
+      }
+      offset.x = mousePos.x - currentX;
+      offset.y = mousePos.y - currentY;
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    }
+
+    function startRotate(evt, element) {
+      evt.preventDefault();
+      selectedElement = element;
+      currentMode = 'rotate';
+
+      let svg = element.ownerSVGElement;
+      let mousePos = getMousePosition(evt, svg);
+
+      // Parse current rotation
+      let transform = element.getAttribute('transform') || "";
+      let rotateMatch = /rotate\(([^)]+)\)/.exec(transform);
+      startRotation = rotateMatch ? parseFloat(rotateMatch[1]) : 0;
+
+      // Parse current translation
+      let translateMatch = /translate\(([^)]+)\)/.exec(transform);
+      let currentX = 0, currentY = 0;
+      if (translateMatch) {
+        let coords = translateMatch[1].split(',');
+        currentX = parseFloat(coords[0]);
+        currentY = parseFloat(coords[1]);
+      }
+
+      // Angle from wedge origin (currentX, currentY) to mouse
+      let dx = mousePos.x - currentX;
+      let dy = mousePos.y - currentY;
+      startAngle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    }
+
+    function onMouseMove(evt) {
+      if (!selectedElement) return;
+      let svg = selectedElement.ownerSVGElement;
+      let mousePos = getMousePosition(evt, svg);
+
+      let transform = selectedElement.getAttribute('transform') || "";
+      let translateMatch = /translate\(([^)]+)\)/.exec(transform);
+      let rotateMatch = /rotate\(([^)]+)\)/.exec(transform);
+
+      let currentX = 0, currentY = 0;
+      if (translateMatch) {
+        let coords = translateMatch[1].split(',');
+        currentX = parseFloat(coords[0]);
+        currentY = parseFloat(coords[1]);
+      }
+      let currentRot = rotateMatch ? parseFloat(rotateMatch[1]) : 0;
+
+      if (currentMode === 'drag') {
+        // Update translation
+        let newX = mousePos.x - offset.x;
+        let newY = mousePos.y - offset.y;
+        let newTransform = `translate(${newX},${newY})`;
+        if (rotateMatch) {
+          newTransform += ` rotate(${currentRot})`;
+        }
+        selectedElement.setAttribute('transform', newTransform);
+
+      } else if (currentMode === 'rotate') {
+        // Rotation
+        let dx = mousePos.x - currentX;
+        let dy = mousePos.y - currentY;
+        let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+        let delta = angle - startAngle;
+        let newRotation = startRotation + delta;
+        let newTransform = `translate(${currentX},${currentY}) rotate(${newRotation})`;
+        selectedElement.setAttribute('transform', newTransform);
+      }
+    }
+
+    function onMouseUp(evt) {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+
+      // If the user dropped the wedge in Step 3, move the wedge to that SVG
+      if (selectedElement && currentMode === 'drag') {
+        let lineSVG = document.getElementById('lineSVG');
+        let rect = lineSVG.getBoundingClientRect();
+        if (evt.clientX >= rect.left && evt.clientX <= rect.right &&
+            evt.clientY >= rect.top && evt.clientY <= rect.bottom) {
+          lineSVG.appendChild(selectedElement);
+          let mousePos = getMousePosition(evt, lineSVG);
+
+          // Keep the wedge's current rotation if any
+          let transform = selectedElement.getAttribute('transform') || "";
+          let rotateMatch = /rotate\(([^)]+)\)/.exec(transform);
+          let currentRot = rotateMatch ? parseFloat(rotateMatch[1]) : 0;
+
+          // Adjust translation so wedge doesn't jump
+          let newX = mousePos.x - offset.x;
+          let newY = mousePos.y - offset.y;
+          let newTransform = `translate(${newX},${newY})`;
+          if (rotateMatch) {
+            newTransform += ` rotate(${currentRot})`;
+          }
+          selectedElement.setAttribute('transform', newTransform);
+        }
+      }
+      selectedElement = null;
+      currentMode = null;
+    }
+
+    // Utility: get mouse position in local SVG coords
+    function getMousePosition(evt, svg) {
+      let CTM = svg.getScreenCTM();
+      return {
+        x: (evt.clientX - CTM.e) / CTM.a,
+        y: (evt.clientY - CTM.f) / CTM.d
+      };
+    }
+  </script>
+
+  <!-- Reset Button -->
+  <div style="text-align:center; margin-top:20px;">
+    <button onclick="location.reload()">Reset Simulation</button>
+  </div>
+
+</body>
+</html>

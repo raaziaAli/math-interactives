@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Triangle Angle Sum Theorem</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1b2e;--surface:#13243d;--surface2:#1a3050;--card:#1e3a5f;
+  --teal:#00d4aa;--blue:#4a9eff;
+  --A:#ff6b6b;--B:#4a9eff;--C:#4ade80;
+  --text:#e8f4ff;--muted:#7a9cc0;--faint:#3a5878;--border:rgba(255,255,255,.08);
+}
+html{font-size:15px}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.header-brand{display:flex;align-items:center;gap:12px}
+.brand-icon{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--A),var(--C));display:flex;align-items:center;justify-content:center;font-size:22px}
+.brand-name{font-size:17px;font-weight:900}
+.brand-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.back-btn{padding:8px 18px;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:800;cursor:pointer;text-decoration:none;transition:all .15s}
+.back-btn:hover{border-color:var(--teal);color:var(--teal)}
+
+.app{display:flex;flex:1;gap:0}
+.main{flex:1;display:flex;flex-direction:column;align-items:center;padding:32px;gap:20px}
+.sidebar{width:300px;background:var(--surface);border-left:1px solid var(--border);padding:24px 18px;display:flex;flex-direction:column;gap:16px;overflow-y:auto}
+
+/* Step tabs */
+.tabs{display:flex;gap:8px;width:100%;max-width:740px}
+.tab{flex:1;padding:10px 6px;border-radius:12px;border:2px solid var(--border);background:rgba(255,255,255,.03);cursor:pointer;text-align:center;font-size:12px;font-weight:800;color:var(--muted);transition:all .18s;font-family:'Nunito',sans-serif}
+.tab:hover{border-color:rgba(255,255,255,.2);color:var(--text)}
+.tab.on{border-color:var(--teal);background:rgba(0,212,170,.1);color:var(--teal)}
+.tab-n{font-size:20px;font-weight:900;display:block;margin-bottom:2px}
+
+/* Canvas */
+.cv-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.3);width:100%;max-width:740px}
+canvas{display:block;width:100%;height:auto}
+
+/* Sliders */
+.sliders{display:flex;flex-direction:column;gap:10px;width:100%;max-width:740px}
+.sl-row{display:flex;align-items:center;gap:12px}
+.sl-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0}
+.sl-lbl{font-size:13px;font-weight:800;min-width:56px}
+.sl-row input{flex:1;cursor:pointer}
+.sl-val{font-size:15px;font-weight:900;min-width:40px;text-align:right}
+
+/* Buttons */
+.btns{display:flex;gap:10px;width:100%;max-width:740px}
+.btn{flex:1;height:46px;border:none;border-radius:12px;font-size:14px;font-weight:900;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .18s}
+.btn-primary{background:linear-gradient(135deg,var(--teal),var(--blue));color:#fff;box-shadow:0 4px 14px rgba(0,212,170,.25)}
+.btn-primary:hover{transform:translateY(-1px)}
+.btn-secondary{background:rgba(255,255,255,.07);border:1.5px solid var(--border);color:var(--muted)}
+.btn-secondary:hover{color:var(--text);border-color:rgba(255,255,255,.2)}
+
+/* Sidebar */
+.sec-title{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.sec-title::before{content:'';width:20px;height:2px;background:var(--teal);border-radius:1px}
+.sum-box{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:18px;text-align:center}
+.sum-row{display:flex;align-items:flex-end;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.sum-ang{display:flex;flex-direction:column;align-items:center;gap:3px}
+.sum-chip{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff}
+.sum-v{font-size:19px;font-weight:900}
+.sum-op{font-size:18px;color:var(--muted);font-weight:900;padding-bottom:4px}
+.sum-total{font-size:30px;font-weight:900;color:var(--teal);border-top:1px solid var(--border);padding-top:8px;margin-top:4px}
+.sum-note{font-size:11px;font-weight:800;color:var(--teal);margin-top:2px}
+.proof-card{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px}
+.proof-step{font-size:12px;color:var(--muted);line-height:1.7;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.proof-step:last-child{border-bottom:none}
+.proof-step strong{color:var(--text)}
+
+@media(max-width:860px){.app{flex-direction:column}.sidebar{width:100%;border-left:none;border-top:1px solid var(--border)}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-brand">
+    <div class="brand-icon">△</div>
+    <div>
+      <div class="brand-name">Triangle Angle Sum Theorem</div>
+      <div class="brand-sub">Interior angles of any triangle always sum to 180°</div>
+    </div>
+  </div>
+  <a class="back-btn" href="index.html">← Back to portal</a>
+</div>
+
+<div class="app">
+  <div class="main">
+
+    <!-- Step tabs -->
+    <div class="tabs" style="width:100%;max-width:740px">
+      <button class="tab on" id="tab0" onclick="goStep(0)"><span class="tab-n">①</span>Triangle</button>
+      <button class="tab"    id="tab1" onclick="goStep(1)"><span class="tab-n">②</span>Cut Angles</button>
+      <button class="tab"    id="tab2" onclick="goStep(2)"><span class="tab-n">③</span>Prove 180°</button>
+    </div>
+
+    <!-- Canvas -->
+    <div class="cv-wrap">
+      <canvas id="cv" width="740" height="380"></canvas>
+    </div>
+
+    <!-- Sliders (step 0 only) -->
+    <div class="sliders" id="sliders">
+      <div class="sl-row">
+        <div class="sl-dot" style="background:var(--A)"></div>
+        <span class="sl-lbl" style="color:var(--A)">Angle A</span>
+        <input type="range" id="slA" min="20" max="140" value="60" style="accent-color:var(--A)" oninput="onSlide()">
+        <span class="sl-val" style="color:var(--A)" id="vA">60°</span>
+      </div>
+      <div class="sl-row">
+        <div class="sl-dot" style="background:var(--B)"></div>
+        <span class="sl-lbl" style="color:var(--B)">Angle B</span>
+        <input type="range" id="slB" min="20" max="140" value="70" style="accent-color:var(--B)" oninput="onSlide()">
+        <span class="sl-val" style="color:var(--B)" id="vB">70°</span>
+      </div>
+      <div class="sl-row" style="opacity:.55">
+        <div class="sl-dot" style="background:var(--C)"></div>
+        <span class="sl-lbl" style="color:var(--C)">Angle C</span>
+        <span style="flex:1;font-size:11px;color:var(--muted)">auto-calculated = 180° − A − B</span>
+        <span class="sl-val" style="color:var(--C)" id="vC">50°</span>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="btns">
+      <button class="btn btn-secondary" onclick="random()">🎲 Random</button>
+      <button class="btn btn-primary"   id="nextBtn" onclick="next()">② Cut the angles →</button>
+    </div>
+
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div>
+      <div class="sec-title">Angle Sum</div>
+      <div class="sum-box">
+        <div class="sum-row">
+          <div class="sum-ang">
+            <div class="sum-chip" style="background:var(--A)">A</div>
+            <span class="sum-v" style="color:var(--A)" id="sA">60°</span>
+          </div>
+          <span class="sum-op">+</span>
+          <div class="sum-ang">
+            <div class="sum-chip" style="background:var(--B)">B</div>
+            <span class="sum-v" style="color:var(--B)" id="sB">70°</span>
+          </div>
+          <span class="sum-op">+</span>
+          <div class="sum-ang">
+            <div class="sum-chip" style="background:var(--C)">C</div>
+            <span class="sum-v" style="color:var(--C)" id="sC">50°</span>
+          </div>
+          <span class="sum-op">=</span>
+        </div>
+        <div class="sum-total">180°</div>
+        <div class="sum-note">✓ Always true for any triangle</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-title">The Proof</div>
+      <div class="proof-card">
+        <div class="proof-step"><strong>Step 1:</strong> Draw any triangle. Label the three <em>interior</em> angles A, B, C.</div>
+        <div class="proof-step"><strong>Step 2:</strong> Tear off (cut out) each of the three angle corners.</div>
+        <div class="proof-step"><strong>Step 3:</strong> Place the three angle pieces side by side, vertices touching a straight line.</div>
+        <div class="proof-step"><strong>Result:</strong> The three angles form a perfectly <strong style="color:var(--teal)">straight line = 180°</strong>.</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-title">Key Rule</div>
+      <div style="background:rgba(0,212,170,.07);border:1px solid rgba(0,212,170,.18);border-radius:12px;padding:14px;font-size:12px;color:var(--muted);line-height:1.7">
+        For <strong style="color:var(--text)">any triangle</strong> — no matter how big, small, or what shape — the three <strong style="color:var(--text)">interior angles always add up to exactly 180°</strong>. This is true for acute, right, and obtuse triangles.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────
+const cv  = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const W = 740, H = 380;
+
+let angA = 60, angB = 70, angC = 50;
+let step = 0;
+let animT = 0, animating = false, raf = null;
+
+const COL = { A:'#ff6b6b', B:'#4a9eff', C:'#4ade80' };
+
+// ── Sliders ────────────────────────────────────────────
+function onSlide() {
+  angA = +document.getElementById('slA').value;
+  angB = +document.getElementById('slB').value;
+  // keep C >= 10
+  if (angA + angB > 170) {
+    angB = 170 - angA;
+    document.getElementById('slB').value = angB;
+  }
+  angC = 180 - angA - angB;
+  sync();
+  draw();
+}
+
+function sync() {
+  document.getElementById('vA').textContent = angA + '°';
+  document.getElementById('vB').textContent = angB + '°';
+  document.getElementById('vC').textContent = angC + '°';
+  document.getElementById('sA').textContent = angA + '°';
+  document.getElementById('sB').textContent = angB + '°';
+  document.getElementById('sC').textContent = angC + '°';
+}
+
+function random() {
+  angA = 25 + Math.floor(Math.random() * 105);
+  angB = 25 + Math.floor(Math.random() * Math.min(105, 155 - angA));
+  angC = 180 - angA - angB;
+  if (angC < 15) { angB -= (15 - angC); angC = 15; }
+  document.getElementById('slA').value = angA;
+  document.getElementById('slB').value = angB;
+  sync(); draw();
+}
+
+// ── Step navigation ────────────────────────────────────
+function goStep(s) {
+  step = s;
+  cancelAnimationFrame(raf);
+  animating = false; animT = 0;
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('on', i===s));
+  document.getElementById('sliders').style.display = s === 0 ? '' : 'none';
+  const btn = document.getElementById('nextBtn');
+  if      (s === 0) { btn.textContent = '② Cut the angles →'; }
+  else if (s === 1) { btn.textContent = '③ Prove 180° →'; }
+  else              { btn.textContent = '▶ Play animation'; }
+  draw();
+}
+
+function next() {
+  if (step < 2) { goStep(step + 1); }
+  else { playAnim(); }
+}
+
+function playAnim() {
+  if (animating) return;
+  animating = true; animT = 0;
+  function frame() {
+    animT = Math.min(1, animT + 0.012);
+    draw();
+    if (animT < 1) raf = requestAnimationFrame(frame);
+    else animating = false;
+  }
+  requestAnimationFrame(frame);
+}
+
+function ease(t) { return t < 0.5 ? 2*t*t : -1 + (4-2*t)*t; }
+
+// ── Triangle geometry ──────────────────────────────────
+// A = bottom-left, B = bottom-right, C = apex
+// Computed from real angles so arcs are always interior.
+function verts() {
+  const baseY = H - 75;
+  const Ax = 110, Bx = W - 110;
+  const base = Bx - Ax;
+  const aR = angA * Math.PI / 180;
+  const bR = angB * Math.PI / 180;
+  // height h using: tan(A) = h / (Cx-Ax) and tan(B) = h / (Bx-Cx)
+  // h = base / (cot A + cot B)
+  const cotA = Math.cos(aR)/Math.sin(aR);
+  const cotB = Math.cos(bR)/Math.sin(bR);
+  let h = base / (cotA + cotB);
+  // Clamp height so C stays on canvas with margin
+  const maxH = baseY - 55;
+  if (h > maxH) h = maxH;
+  const Cx = Ax + h * cotA;
+  const Cy = baseY - h;
+  return {
+    A: { x: Ax,  y: baseY },
+    B: { x: Bx,  y: baseY },
+    C: { x: Cx,  y: Cy    },
+  };
+}
+
+// ── STEP 0 — Draw triangle with interior arcs ──────────
+function drawStep0() {
+  const { A, B, C } = verts();
+
+  // Filled triangle
+  ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.lineTo(C.x,C.y); ctx.closePath();
+  ctx.fillStyle = 'rgba(255,255,255,.05)'; ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,.4)'; ctx.lineWidth = 2.5; ctx.stroke();
+
+  // Interior angle arcs
+  drawArc(A, B, C, angA, 'A', COL.A);
+  drawArc(B, A, C, angB, 'B', COL.B);
+  drawArc(C, A, B, angC, 'C', COL.C);
+
+  // Vertex dots
+  [A,B,C].forEach(v => {
+    ctx.beginPath(); ctx.arc(v.x,v.y,4,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,.4)'; ctx.fill();
+  });
+
+  ctx.fillStyle='rgba(0,212,170,.5)'; ctx.font='bold 12px Nunito,sans-serif';
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.fillText('Step 1 — Adjust the sliders to explore any triangle. A, B, C are the interior angles.', 16, 22);
+}
+
+// Draw the interior angle arc at vertex V, with the other two vertices V1 and V2
+function drawArc(V, V1, V2, deg, lbl, color) {
+  // Draw the INTERIOR angle arc at vertex V.
+  // V1 and V2 are the other two vertices — they define the two edges meeting at V.
+  // The interior angle is the one INSIDE the triangle.
+  const R = 44;
+  const d1 = Math.atan2(V1.y - V.y, V1.x - V.x); // direction from V toward V1
+  const d2 = Math.atan2(V2.y - V.y, V2.x - V.x); // direction from V toward V2
+
+  // Compute the centroid to determine which side is interior
+  const cx = (V.x + V1.x + V2.x) / 3;
+  const cy = (V.y + V1.y + V2.y) / 3;
+  const centDir = Math.atan2(cy - V.y, cx - V.x); // direction from V to centroid = interior
+
+  // CCW sweep from d1 to d2
+  let sweepCCW = d2 - d1;
+  while (sweepCCW <  0)         sweepCCW += 2*Math.PI;
+  while (sweepCCW >= 2*Math.PI) sweepCCW -= 2*Math.PI;
+
+  // Mid of the CCW arc from d1 to d2
+  const midCCW = d1 + sweepCCW / 2;
+  // Mid of the CW arc from d1 to d2
+  const midCW  = d1 - (2*Math.PI - sweepCCW) / 2;
+
+  // Choose whichever mid points toward the centroid (interior side)
+  // Compare angular distance from each mid to centDir
+  const diffCCW = Math.abs(Math.atan2(Math.sin(centDir-midCCW), Math.cos(centDir-midCCW)));
+  const diffCW  = Math.abs(Math.atan2(Math.sin(centDir-midCW),  Math.cos(centDir-midCW)));
+
+  let mid, anticlockwise;
+  if (diffCCW <= diffCW) {
+    // CCW arc is the interior one
+    mid = midCCW;
+    anticlockwise = false;
+  } else {
+    // CW arc is the interior one
+    mid = midCW;
+    anticlockwise = true;
+  }
+
+  // Draw filled sector
+  ctx.beginPath();
+  ctx.moveTo(V.x, V.y);
+  ctx.arc(V.x, V.y, R, d1, d2, anticlockwise);
+  ctx.closePath();
+  ctx.fillStyle  = color + '2e'; ctx.fill();
+  ctx.strokeStyle= color; ctx.lineWidth = 2; ctx.stroke();
+
+  // Letter label INSIDE the arc
+  ctx.fillStyle    = color;
+  ctx.font         = 'bold 13px Nunito,sans-serif';
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(lbl, V.x + Math.cos(mid)*(R - 14), V.y + Math.sin(mid)*(R - 14));
+
+  // Degree label OUTSIDE the arc
+  ctx.font = 'bold 11px Nunito,sans-serif';
+  ctx.fillText(deg + '°', V.x + Math.cos(mid)*(R + 20), V.y + Math.sin(mid)*(R + 20));
+}
+
+// ── STEP 1 — Three separate angle wedges ───────────────
+function drawStep1() {
+  const { A, B, C } = verts();
+
+  // Faded triangle hint
+  ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.lineTo(C.x,C.y); ctx.closePath();
+  ctx.strokeStyle='rgba(255,255,255,.09)'; ctx.lineWidth=1.5; ctx.stroke();
+
+  // Three wedges spread across the canvas
+  // Each wedge: vertex at bottom, opening upward symmetrically
+  const R = 70;
+  const baseY = H - 80;
+  const xs = [W*0.2, W*0.5, W*0.8];
+  const angs  = [angA, angB, angC];
+  const lbls  = ['A',  'B',  'C' ];
+  const cols  = [COL.A, COL.B, COL.C];
+
+  angs.forEach((a, i) => {
+    const cx = xs[i], cy = baseY;
+    const aR = a * Math.PI / 180;
+    // Wedge opens straight upward: left ray at -(π/2 + aR/2), right ray at -(π/2 - aR/2)
+    // Both rays pointing upward from (cx, cy)
+    const leftRay  = -(Math.PI/2 + aR/2);   // left of centre
+    const rightRay = -(Math.PI/2 - aR/2);   // right of centre
+
+    // Draw wedge: arc from leftRay to rightRay going CCW (through the top = negative y)
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, R, leftRay, rightRay, false); // false=CW in canvas = sweeps upward
+    ctx.closePath();
+    ctx.fillStyle  = cols[i] + '28'; ctx.fill();
+    ctx.strokeStyle= cols[i]; ctx.lineWidth = 2.5; ctx.stroke();
+
+    // Label inside wedge (centre = straight up)
+    ctx.fillStyle = cols[i]; ctx.font='bold 16px Nunito,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(lbls[i], cx, cy - R*0.48);
+    ctx.font='bold 13px Nunito,sans-serif';
+    ctx.fillText(a+'°',   cx, cy - R - 16);
+  });
+
+  ctx.fillStyle='rgba(0,212,170,.5)'; ctx.font='bold 12px Nunito,sans-serif';
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.fillText('Step 2 — The three interior angle wedges are cut out from the triangle.', 16, 22);
+}
+
+// ── STEP 2 — Wedges placed end-to-end on a straight line ─
+function drawStep2() {
+  const lineY = H / 2 + 40;
+  const R     = 110;
+  const pivot = W / 2;
+  const t = ease(animT);
+
+  // ── Straight line ──────────────────────────────────
+  ctx.strokeStyle='rgba(255,255,255,.35)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(60, lineY); ctx.lineTo(W-60, lineY); ctx.stroke();
+  // end ticks
+  [[60,lineY],[W-60,lineY]].forEach(([x,y])=>{
+    ctx.strokeStyle='rgba(255,255,255,.3)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(x,y-9); ctx.lineTo(x,y+9); ctx.stroke();
+  });
+  ctx.fillStyle='rgba(255,255,255,.28)'; ctx.font='bold 12px Nunito,sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  ctx.fillText('straight line = 180°', W/2, lineY+12);
+
+  // ── Three wedges placed end-to-end above the line ──
+  // All share the same pivot on the line at W/2.
+  // Wedge i spans from angle startR to endR (in canvas radians).
+  // Canvas: π = left, 0 = right. Angles ABOVE the line = between 0 and π.
+  // We fill left-to-right: wedge A from π down to π-angA, etc.
+  // Drawing only the region ABOVE the line = semicircle top half only.
+
+  const angs = [angA, angB, angC];
+  const cols = [COL.A, COL.B, COL.C];
+  const lbls = ['A', 'B', 'C'];
+  let cumDeg = 0;
+
+  angs.forEach((a, i) => {
+    const delay  = i * 0.22;
+    const localT = Math.max(0, Math.min(1, (t - delay) / 0.32));
+    const et     = ease(localT);
+    const flyOff = (1 - et) * 150;
+
+    // Left and right boundary angles (in canvas radians, above the line)
+    // Above-line angles run from π (left) down to 0 (right)
+    const leftR  = Math.PI - cumDeg * Math.PI / 180;           // left edge
+    const rightR = Math.PI - (cumDeg + a) * Math.PI / 180;     // right edge
+    // Points where the two rays meet the line (both at pivot)
+    // Arc: goes CW from leftR to rightR (anticlockwise=false)
+    // This arc stays entirely ABOVE the line because both angles are between 0 and π
+    // and sin(angle) >= 0 for that range — which in canvas (y-down) means y <= lineY ✓
+
+    const leftX  = pivot + Math.cos(leftR)  * R;
+    const leftY  = lineY + Math.sin(leftR)  * R;   // sin(leftR) >= 0 so leftY >= lineY BUT...
+    // Wait: canvas y-down. sin(π) = 0, sin(π/2) = 1 → point is BELOW centre → BELOW line!
+    // We need sin to be NEGATIVE for above the line. So rays go at angles with sin < 0.
+    // Angles between π and 2π have sin < 0 = above the line in canvas coords.
+    // So we need to use angles between π and 2π, not 0 and π.
+    // Reframe: left edge = π + cumDeg*(π/180), right edge = π + (cumDeg+a)*(π/180)
+    // Going from π (left) to 2π (right) via the TOP of the circle (3π/2 = straight up).
+    // Arc drawn CCW (anticlockwise=true) from leftR2 to rightR2
+    const leftR2  = Math.PI + cumDeg * Math.PI / 180;
+    const rightR2 = Math.PI + (cumDeg + a) * Math.PI / 180;
+    // Both are between π and 2π so sin < 0 → y < lineY → ABOVE the line ✓
+
+    ctx.save();
+    ctx.translate(0, -flyOff);
+    ctx.globalAlpha = et;
+
+    // Draw wedge as: pivot → left ray → arc (CCW above) → right ray → back to pivot
+    const lx = pivot + Math.cos(leftR2)  * R;
+    const ly = lineY + Math.sin(leftR2)  * R;   // sin < 0 → ly < lineY (above) ✓
+    const rx = pivot + Math.cos(rightR2) * R;
+    const ry = lineY + Math.sin(rightR2) * R;
+
+    ctx.beginPath();
+    ctx.moveTo(pivot, lineY);          // start at pivot on line
+    ctx.lineTo(lx, ly);                // left ray upward
+    ctx.arc(pivot, lineY, R, leftR2, rightR2, false); // arc CCW = goes through top ✓
+    ctx.lineTo(pivot, lineY);          // right ray back to pivot
+    ctx.closePath();
+
+    ctx.fillStyle  = cols[i] + '35'; ctx.fill();
+    ctx.strokeStyle= cols[i]; ctx.lineWidth = 2.5; ctx.stroke();
+
+    // Label inside wedge at mid-angle
+    const midR2 = (leftR2 + rightR2) / 2;
+    const lbx = pivot + Math.cos(midR2) * R * 0.55;
+    const lby = lineY + Math.sin(midR2) * R * 0.55; // sin < 0 → above line ✓
+    ctx.fillStyle = cols[i]; ctx.font='bold 15px Nunito,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(lbls[i], lbx, lby);
+
+    // Degree label outside arc
+    const ox = pivot + Math.cos(midR2) * (R + 22);
+    const oy = lineY + Math.sin(midR2) * (R + 22);
+    ctx.font='bold 12px Nunito,sans-serif';
+    ctx.fillText(a+'°', ox, oy);
+
+    ctx.restore();
+    cumDeg += a;
+  });
+
+  // ── Dividing radii between wedges ──────────────────
+  if (t > 0.5) {
+    const fade = Math.min(1, (t - 0.5) / 0.25);
+    ctx.globalAlpha = fade * 0.45;
+    ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.setLineDash([5,5]);
+    [angA, angA + angB].forEach(cumD => {
+      const r = Math.PI + cumD * Math.PI / 180;
+      ctx.beginPath();
+      ctx.moveTo(pivot, lineY);
+      ctx.lineTo(pivot + Math.cos(r)*R, lineY + Math.sin(r)*R);
+      ctx.stroke();
+    });
+    ctx.setLineDash([]); ctx.globalAlpha = 1;
+  }
+
+  // ── Final result banner ─────────────────────────────
+  if (t > 0.9) {
+    const fade = Math.min(1, (t - 0.9) / 0.1);
+    ctx.globalAlpha = fade;
+    ctx.fillStyle = '#00d4aa'; ctx.font='bold 22px Nunito,sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(`${angA}° + ${angB}° + ${angC}° = 180° ✓`, W/2, lineY - R - 30);
+    ctx.globalAlpha = 1;
+  }
+
+  ctx.fillStyle='rgba(0,212,170,.55)'; ctx.font='bold 12px Nunito,sans-serif';
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.fillText('Step 3 — The three angles sit perfectly on the straight line, proving they sum to 180°.', 16, 22);
+}
+
+// ── Main draw dispatcher ───────────────────────────────
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0d1b2e'; ctx.fillRect(0,0,W,H);
+  // dot grid
+  ctx.fillStyle='rgba(255,255,255,.025)';
+  for(let x=40;x<W;x+=40) for(let y=30;y<H;y+=40){
+    ctx.beginPath(); ctx.arc(x,y,1.5,0,Math.PI*2); ctx.fill();
+  }
+  if      (step===0) drawStep0();
+  else if (step===1) drawStep1();
+  else               drawStep2();
+}
+
+sync();
+draw();
+</script>
+</body>
+</html>

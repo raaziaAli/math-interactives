@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Percent Explorer – Double Number Lines, Tape Diagrams & Quiz</title>
+<title>Percent Explorer √ê Double Number Lines, Tape Diagrams & Quiz</title>
 <style>
   :root{ --bg:#0b1020; --panel:#141a33; --ink:#eef3ff; --muted:#aab4d6; --accent:#6ea8fe; --ok:#2bd3a3; --warn:#ffd166; --err:#ff6b6b; }
   html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
@@ -30,6 +30,106 @@
 </style>
 </head>
 <body>
+  <nav class="mac-topnav" role="navigation" aria-label="Main navigation">
+  <a href="https://raaziaali.github.io/" class="mac-home-btn" aria-label="Back to Mrs. Ali's Classroom home">
+    <svg class="mac-home-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    <span class="mac-home-text">Mrs. Ali's Classroom</span>
+  </a>
+</nav>
+
+<style>
+  .mac-topnav {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 99999;
+    padding: 10px 16px;
+    background: rgba(10, 10, 31, 0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(196, 181, 253, 0.2);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "DM Sans", sans-serif;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    margin: 0;
+  }
+  .mac-home-btn {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 8px;
+    color: #F8F9FF !important;
+    text-decoration: none !important;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: background 0.2s, transform 0.2s, color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    border: none;
+    background: transparent;
+  }
+  .mac-home-btn:hover,
+  .mac-home-btn:focus {
+    background: rgba(0, 229, 255, 0.12) !important;
+    color: #00E5FF !important;
+    outline: none;
+  }
+  .mac-home-btn:active {
+    transform: translateX(-2px);
+  }
+  .mac-home-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .mac-home-text { white-space: nowrap; }
+  @media (max-width: 500px) {
+    .mac-topnav { padding: 8px 12px; }
+    .mac-home-text { font-size: 13px; }
+  }
+  .mac-topnav, .mac-topnav * { box-sizing: border-box; }
+  [data-mac-legacy-hidden="true"] { display: none !important; }
+</style>
+
+<script>
+  (function() {
+    function hideLegacyBackLinks() {
+      var patterns = [
+        /^\s*(\u2190|<-|\u2039|\u00ab|\u2039\u2039|\u2190+|<+)\s*back/i,
+        /^\s*back\s+to\b/i,
+        /^\s*back\s*(home|$)/i,
+        /^\s*home\s*$/i,
+        /portal\s*$/i,
+        /back\s+to\s+portal/i,
+        /back\s+to\s+home/i,
+        /return\s+to/i,
+        /all\s+tools/i
+      ];
+      var links = document.querySelectorAll('a, button');
+      for (var i = 0; i < links.length; i++) {
+        var el = links[i];
+        if (el.classList.contains('mac-home-btn')) continue;
+        if (el.closest && el.closest('.mac-topnav')) continue;
+        var text = (el.textContent || '').trim();
+        if (!text) continue;
+        for (var j = 0; j < patterns.length; j++) {
+          if (patterns[j].test(text)) {
+            el.setAttribute('data-mac-legacy-hidden', 'true');
+            break;
+          }
+        }
+      }
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', hideLegacyBackLinks);
+    } else {
+      hideLegacyBackLinks();
+    }
+  })();
+</script>
 <div class="wrap">
   <h1>Percent Explorer</h1>
   <p class="lead">Just percentages. Use the <strong>double number line</strong>, the <strong>tape diagram</strong>, and the <strong>sale price steps</strong>. Finish with a short quiz.</p>
@@ -37,7 +137,7 @@
   <!-- Section 1: Double Number Line -->
   <section class="card" id="dnl">
     <h2>1) Double Number Line: What is P% of a Whole?</h2>
-    <p class="hint">Top line is % (0–100). Bottom line is the amount from 0 to the whole. Slide the percent to see the part.</p>
+    <p class="hint">Top line is % (0√ê100). Bottom line is the amount from 0 to the whole. Slide the percent to see the part.</p>
     <div class="row">
       <label>Whole</label>
       <input type="number" id="d_whole" value="60" min="0" step="1">
@@ -112,14 +212,14 @@
         <label class="option"><input type="radio" name="q1" value="25"> 25</label>
       </div>
       <div class="box">
-        <p><strong>Q2.</strong> 40% of 90 is …</p>
+        <p><strong>Q2.</strong> 40% of 90 is √â</p>
         <label class="option"><input type="radio" name="q2" value="32"> 32</label>
         <label class="option"><input type="radio" name="q2" value="36"> 36</label>
         <label class="option"><input type="radio" name="q2" value="45"> 45</label>
         <label class="option"><input type="radio" name="q2" value="60"> 60</label>
       </div>
       <div class="box">
-        <p><strong>Q3.</strong> If 18 is 30% of a number, the number is …</p>
+        <p><strong>Q3.</strong> If 18 is 30% of a number, the number is √â</p>
         <label class="option"><input type="radio" name="q3" value="48"> 48</label>
         <label class="option"><input type="radio" name="q3" value="54"> 54</label>
         <label class="option"><input type="radio" name="q3" value="60"> 60</label>
@@ -133,7 +233,7 @@
         <label class="option"><input type="radio" name="q4" value="40"> 40%</label>
       </div>
       <div class="box">
-        <p><strong>Q5.</strong> A store shows “25% off, then 8% tax after the discount.” If the original price is $80, the final price is closest to …</p>
+        <p><strong>Q5.</strong> A store shows √í25% off, then 8% tax after the discount.√ì If the original price is $80, the final price is closest to √â</p>
         <label class="option"><input type="radio" name="q5" value="60"> $60.00</label>
         <label class="option"><input type="radio" name="q5" value="64.8"> $64.80</label>
         <label class="option"><input type="radio" name="q5" value="68.4"> $68.40</label>

@@ -44,6 +44,106 @@
 </style>
 </head>
 <body>
+  <nav class="mac-topnav" role="navigation" aria-label="Main navigation">
+  <a href="https://raaziaali.github.io/" class="mac-home-btn" aria-label="Back to Mrs. Ali's Classroom home">
+    <svg class="mac-home-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    <span class="mac-home-text">Mrs. Ali's Classroom</span>
+  </a>
+</nav>
+
+<style>
+  .mac-topnav {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 99999;
+    padding: 10px 16px;
+    background: rgba(10, 10, 31, 0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(196, 181, 253, 0.2);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "DM Sans", sans-serif;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    margin: 0;
+  }
+  .mac-home-btn {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 8px;
+    color: #F8F9FF !important;
+    text-decoration: none !important;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: background 0.2s, transform 0.2s, color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    border: none;
+    background: transparent;
+  }
+  .mac-home-btn:hover,
+  .mac-home-btn:focus {
+    background: rgba(0, 229, 255, 0.12) !important;
+    color: #00E5FF !important;
+    outline: none;
+  }
+  .mac-home-btn:active {
+    transform: translateX(-2px);
+  }
+  .mac-home-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .mac-home-text { white-space: nowrap; }
+  @media (max-width: 500px) {
+    .mac-topnav { padding: 8px 12px; }
+    .mac-home-text { font-size: 13px; }
+  }
+  .mac-topnav, .mac-topnav * { box-sizing: border-box; }
+  [data-mac-legacy-hidden="true"] { display: none !important; }
+</style>
+
+<script>
+  (function() {
+    function hideLegacyBackLinks() {
+      var patterns = [
+        /^\s*(\u2190|<-|\u2039|\u00ab|\u2039\u2039|\u2190+|<+)\s*back/i,
+        /^\s*back\s+to\b/i,
+        /^\s*back\s*(home|$)/i,
+        /^\s*home\s*$/i,
+        /portal\s*$/i,
+        /back\s+to\s+portal/i,
+        /back\s+to\s+home/i,
+        /return\s+to/i,
+        /all\s+tools/i
+      ];
+      var links = document.querySelectorAll('a, button');
+      for (var i = 0; i < links.length; i++) {
+        var el = links[i];
+        if (el.classList.contains('mac-home-btn')) continue;
+        if (el.closest && el.closest('.mac-topnav')) continue;
+        var text = (el.textContent || '').trim();
+        if (!text) continue;
+        for (var j = 0; j < patterns.length; j++) {
+          if (patterns[j].test(text)) {
+            el.setAttribute('data-mac-legacy-hidden', 'true');
+            break;
+          }
+        }
+      }
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', hideLegacyBackLinks);
+    } else {
+      hideLegacyBackLinks();
+    }
+  })();
+</script>
 <div class="wrap">
   <h1>Translating Words To Equations - Interactive Applet</h1>
   <p class="mini">Practice turning English statements into linear equations, then solve and export a PDF report of your work. Includes a study guide summarizing the chapter keywords and steps.</p>
@@ -78,7 +178,7 @@
 
   <div id="work" class="card">
     <div class="mini">Statement</div>
-    <div id="stmt" class="equation">Ñ</div>
+    <div id="stmt" class="equation">Ã‘</div>
 
     <div class="row" style="margin-top:10px">
       <input id="eqInput" class="text" placeholder="Type your equation (e.g., x + 12 = 30 or 3/4 x = -6)" style="min-width:340px"/>
@@ -341,12 +441,12 @@
   // ----- Save / Export -----
   function snapshot(){ return { timestamp:new Date().toISOString(), mode:modeSel.value, difficulty:diffSel.value, statement:current.text, target:eqToString(current.eq), steps:Array.from(historyEl.querySelectorAll('li')).map(li=>li.textContent) }; }
   function downloadFile(name, content, mime){ var blob=new Blob([content],{type:mime}); var url=URL.createObjectURL(blob); var a=document.createElement('a'); a.href=url; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
-  function toTxt(data){ let L=[]; L.push('Translating Words ? Equations Ñ Report'); L.push('Date: '+new Date(data.timestamp).toLocaleString()); L.push('Mode: '+data.mode+' | Difficulty: '+data.difficulty); L.push('Statement: '+data.statement); L.push('Target: '+data.target); L.push(''); L.push('Progress:'); if(!data.steps.length) L.push('  (no steps yet)'); else data.steps.forEach((s,i)=>L.push('  '+(i+1)+'. '+s)); return L.join('\n'); }
+  function toTxt(data){ let L=[]; L.push('Translating Words ? Equations Ã‘ Report'); L.push('Date: '+new Date(data.timestamp).toLocaleString()); L.push('Mode: '+data.mode+' | Difficulty: '+data.difficulty); L.push('Statement: '+data.statement); L.push('Target: '+data.target); L.push(''); L.push('Progress:'); if(!data.steps.length) L.push('  (no steps yet)'); else data.steps.forEach((s,i)=>L.push('  '+(i+1)+'. '+s)); return L.join('\n'); }
   function saveLocal(){ try{ localStorage.setItem('translating_session', JSON.stringify(snapshot())); eqFeedback.textContent='Saved to this browser.'; } catch(e){ eqFeedback.textContent='Save failed: '+e; } }
   function loadLocal(){ try{ let raw=localStorage.getItem('translating_session'); if(!raw){ eqFeedback.textContent='No saved session.'; return; } let data=JSON.parse(raw); restore(data); eqFeedback.textContent='Loaded last session.'; } catch(e){ eqFeedback.textContent='Load failed: '+e; } }
   function restore(data){ current.text=data.statement; stmtEl.textContent=data.statement; try{ var parts=data.target.split('='); current.eq={L:parseExpr(parts[0]), R:parseExpr(parts[1])}; }catch(e){} historyEl.innerHTML=''; (data.steps||[]).forEach(s=>pushHistory(s)); }
   function openPrint(){ var data=snapshot(); var stepsHtml=(data.steps&&data.steps.length)? data.steps.map(s=>'<li>'+escapeHTML(s)+'</li>').join(''):'<li>(no steps yet)</li>'; var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Word?Equation Report</title><style>body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;margin:24px;color:#222}h1{font-size:20px;margin:0 0 8px}.muted{color:#555}.sec{margin-top:16px}ol{padding-left:20px}code{background:#f2f4f8;padding:2px 5px;border-radius:4px}</style></head><body>'+
-    '<h1>Translating Words ? Equations Ñ Report</h1>'+
+    '<h1>Translating Words ? Equations Ã‘ Report</h1>'+
     '<div class="muted">Date: '+new Date(data.timestamp).toLocaleString()+'</div>'+
     '<div class="muted">Mode: '+data.mode+' | Difficulty: '+data.difficulty+'</div>'+
     '<div class="sec"><strong>Statement:</strong> '+escapeHTML(data.statement)+'</div>'+
